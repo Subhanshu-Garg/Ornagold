@@ -1,5 +1,13 @@
-import React, { useState } from 'react';
-import { StyleSheet, View, Text, ScrollView, TextInput, TouchableOpacity } from 'react-native';
+import React, { useState, useRef } from 'react';
+import {
+  StyleSheet,
+  View,
+  Text,
+  ScrollView,
+  TextInput,
+  TouchableOpacity,
+  Keyboard,
+} from 'react-native';
 import { RouteProp } from '@react-navigation/native';
 import MapView, { Marker } from 'react-native-maps';
 import { RootStackParamList } from '../types';
@@ -11,10 +19,59 @@ type ShopScreenProps = {
 export default function ShopScreen({ route }: ShopScreenProps) {
   const { shop } = route.params;
   const [newReview, setNewReview] = useState('');
+  const [reviews, setReviews] = useState(shop.reviews);
+  const [rating, setRating] = useState(0);
+  const [submitReviewWarning, setsubmitReviewWarning] = useState('')
 
   const handleSubmitReview = () => {
-    // In a real app, this would send the review to a backend
+    Keyboard.dismiss()
+    setsubmitReviewWarning('')
+    if (newReview.trim() === '') {
+      setsubmitReviewWarning('Please enter review.')
+      return
+    } // Don't submit empty reviews
+    if (rating === 0) {
+      setsubmitReviewWarning('Please give the rating.')
+      return
+    }
+    // Add the new review
+    setReviews([
+      {
+        id: (reviews.length + 1).toString(),
+        userName: 'New User',
+        rating,
+        comment: newReview,
+        date: new Date().toLocaleDateString(),
+      },
+      ...reviews,
+    ]);
+
+    // Reset the form
+    setRating(0);
     setNewReview('');
+  };
+
+  const StarRating = () => {
+    return (
+      <View style={styles.ratingTitleContainer}>
+        <View style={styles.ratingTextContainer}>
+          <Text style={styles.ratingTitle}>Rate and review</Text>
+        </View>
+        <View style={styles.starContainer}>
+          {[1, 2, 3, 4, 5].map((star) => (
+            <TouchableOpacity
+              key={star}
+              onPress={() => setRating(star)}
+              style={styles.starButton}
+            >
+              <Text style={[styles.starText, { color: star <= rating ? '#FFD700' : '#CCCCCC' }]}>
+                ★
+              </Text>
+            </TouchableOpacity>
+          ))}
+        </View>
+      </View>
+    );
   };
 
   return (
@@ -48,36 +105,42 @@ export default function ShopScreen({ route }: ShopScreenProps) {
           </View>
         </View>
 
+        <View style={styles.separator} />
+        <View style={styles.addReviewContainer}>
+          <StarRating />
+          <View style={styles.inputButtonContainer}>
+            <TextInput
+              style={styles.reviewInput}
+              placeholder="Write your review..."
+              value={newReview}
+              onChangeText={setNewReview}
+              multiline
+            />
+            <TouchableOpacity
+              style={styles.submitButton}
+              onPress={handleSubmitReview}
+            >
+              <Text style={styles.submitButtonText}>Submit</Text>
+            </TouchableOpacity>
+          </View>
+          <Text style={[styles.warningText, !submitReviewWarning && styles.hiddenWarning]}>
+            {submitReviewWarning}
+          </Text>
+        </View>
 
-      <View style={styles.reviewsContainer}>
+        <View style={styles.separator} />
+        <View style={styles.reviewsContainer}>
           <Text style={styles.sectionTitle}>Reviews</Text>
-          {shop.reviews.map((review) => (
+          {reviews.map((review) => (
             <View key={review.id} style={styles.reviewItem}>
               <Text style={styles.reviewUser}>{review.userName}</Text>
               <Text style={styles.reviewRating}>Rating: {review.rating}/5</Text>
               <Text style={styles.reviewComment}>{review.comment}</Text>
             </View>
           ))}
-      </View>
+        </View>
       </ScrollView>
-      <View style={styles.addReviewContainer}>
-        <TextInput
-          style={styles.reviewInput}
-          placeholder="Write your review..."
-          value={newReview}
-          onChangeText={setNewReview}
-          multiline
-        />
-        <TouchableOpacity
-          style={styles.submitButton}
-          onPress={handleSubmitReview}
-        >
-          <Text style={styles.submitButtonText}>Submit Review</Text>
-        </TouchableOpacity>
-      </View>
-
     </View>
-    
   );
 }
 
@@ -135,24 +198,71 @@ const styles = StyleSheet.create({
     fontSize: 14,
   },
   addReviewContainer: {
-    padding: 15
+    padding: 15,
+    paddingTop: 0,
+  },
+  inputButtonContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 10,
   },
   reviewInput: {
+    flex: 1,
     borderWidth: 1,
     borderColor: '#ddd',
     borderRadius: 8,
     padding: 10,
     minHeight: 50,
-    marginBottom: 10,
   },
   submitButton: {
     backgroundColor: '#007AFF',
     padding: 15,
     borderRadius: 8,
     alignItems: 'center',
+    justifyContent: 'center',
   },
   submitButtonText: {
     color: 'white',
     fontWeight: 'bold',
+  },
+  ratingTitleContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingHorizontal: 5,
+    marginBottom: 5,
+  },
+  ratingTextContainer: {
+    flex: 1,
+  },
+  ratingTitle: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: '#333',
+  },
+  starContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  starButton: {
+    padding: 3,
+  },
+  starText: {
+    fontSize: 24,
+  },
+  separator: {
+    height: 1,
+    backgroundColor: '#ddd',
+    marginBottom: 15,
+  },
+  warningText: {
+    color: 'red',
+    marginTop: 5,
+    fontSize: 14,
+    height: 'auto', // Default height when there is text
+  },
+  hiddenWarning: {
+    height: 0, // Make it disappear when empty
+    opacity: 0, // Hide the text
   },
 });
