@@ -20,7 +20,7 @@ export interface Review {
   rating: number;
   shopId: string;
   userId: string;
-  userName: string;
+  displayName: string;
   comment: string;
   createdAt: string;
 }
@@ -34,8 +34,8 @@ export type SignInParams =
 };
 
 export type SignUpParams =
-  | { method: 'email'; email: string; password: string }
-  | { method: 'phone'; phone: string; code?: string };
+  | { method: 'email'; email: string; password: string; displayName: string }
+  | { method: 'phone'; phone: string; code?: string; displayName: string };
 
 export interface AuthContextType {
   user: User | null;

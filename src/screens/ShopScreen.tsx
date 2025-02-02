@@ -71,7 +71,7 @@ export default function ShopScreen({ route, navigation }: ShopScreenProps) {
           userId: user?.id,
           rating,
           shopId: shop.id,
-          userName: user?.email,
+          displayName: user?.user_metadata?.displayName,
           comment: newReview
         };
 
@@ -194,7 +194,7 @@ export default function ShopScreen({ route, navigation }: ShopScreenProps) {
         <Text style={styles.sectionTitle}>Reviews</Text>
         {reviews?.map((review) => (
           <View key={review.id} style={styles.reviewItem}>
-            <Text style={styles.reviewUser}>{review.userName}</Text>
+            <Text style={styles.reviewUser}>{review?.displayName || 'Unknown User'}</Text>
             <Text style={styles.reviewRating}>Rating: {review.rating}/5</Text>
             <Text style={styles.reviewComment}>{review.comment}</Text>
           </View>

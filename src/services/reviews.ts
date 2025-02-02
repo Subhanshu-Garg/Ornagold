@@ -31,7 +31,7 @@ export const submitShopReview = async (
           rating: review.rating,
           comment: review.comment,
           userId: review.userId,
-          userName: review.userName
+          displayName: review.displayName
         })
         .single();
   

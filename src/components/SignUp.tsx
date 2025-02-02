@@ -26,7 +26,7 @@ export default function SignUp({ navigation, route }: SignUpProps) {
   const [phone, setPhone] = useState("");
   const [otp, setOtp] = useState("");
   const [showOtpField, setShowOtpField] = useState(false);
-  const [username, setUsername] = useState("");
+  const [displayName, setDisplayName] = useState("");
   const [form, setForm] = useState<"email" | "phone">("email");
 
   const { signUp, loading } = useAuth();
@@ -43,7 +43,8 @@ export default function SignUp({ navigation, route }: SignUpProps) {
         email,
         password,
         phone,
-        code: otp
+        code: otp,
+        displayName
       });
 
       
@@ -66,9 +67,9 @@ export default function SignUp({ navigation, route }: SignUpProps) {
     <View>
       <TextInput
         style={styles.input}
-        placeholder="Username"
-        value={username}
-        onChangeText={setUsername}
+        placeholder="Your name"
+        value={displayName}
+        onChangeText={setDisplayName}
         autoCapitalize="none"
       />
       
@@ -117,10 +118,10 @@ export default function SignUp({ navigation, route }: SignUpProps) {
         </>
       )}
 
-      <View style={styles.switchContainer}>
+      {/* <View style={styles.switchContainer}>
         <Text>Are you a shop owner?</Text>
         <Switch value={isShopOwner} onValueChange={setIsShopOwner} />
-      </View>
+      </View> */}
 
       {error && <Text style={{ color: "red" }}>{error}</Text>}
 
@@ -140,14 +141,14 @@ export default function SignUp({ navigation, route }: SignUpProps) {
         </Text>
       </TouchableOpacity>
 
-      <TouchableOpacity
+      {/* <TouchableOpacity
         style={styles.switchText}
         onPress={() => setForm(form === "email" ? "phone" : "email")}
       >
         <Text style={styles.switchText}>
           {form === "email" ? "Use Phone Instead" : "Use Email Instead"}
         </Text>
-      </TouchableOpacity>
+      </TouchableOpacity> */}
     </View>
   );
 }
