@@ -7,12 +7,12 @@ import {
   TextInput,
   TouchableOpacity,
   Keyboard,
+  Linking,
 } from 'react-native';
 import { RouteProp } from '@react-navigation/native';
 import MapView, { Marker } from 'react-native-maps';
 import { RootStackParamList } from '../types';
-import { WebView } from 'react-native-webview';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { Icon } from 'react-native-elements'
 
 
 type ShopScreenProps = {
@@ -77,6 +77,10 @@ export default function ShopScreen({ route }: ShopScreenProps) {
     );
   };
 
+  const handleCallPress = (phoneNumber: string) => {
+    Linking.openURL(`tel:${phoneNumber}`);
+  };
+
   return (
     <ScrollView style={styles.container}>
       <View style={styles.mapContainer}>
@@ -98,32 +102,21 @@ export default function ShopScreen({ route }: ShopScreenProps) {
             title={shop.name}
           />
         </MapView>
-        
-        {/* <WebView
-          style={styles.map}
-          source={{ 
-            html: `
-              <iframe 
-                src="${shop.google_map_link}" 
-                width="100%" 
-                height="200" 
-                style="border:0;" 
-                loading="lazy" 
-                referrerpolicy="no-referrer-when-downgrade">
-              </iframe>
-            `
-          }}
-          javaScriptEnabled={true}
-          domStorageEnabled={true}
-          scalesPageToFit={false}
-        /> */}
       </View>
 
       <View style={styles.detailsContainer}>
         <Text style={styles.address}>{shop.address}</Text>
-        <View style={styles.ratesContainer}>
-          <Text style={styles.rateText}>Making Charges: {shop.makingCharges}%</Text>
-          <Text style={styles.rateText}>Gold Rate: ₹{shop.goldRate}/g</Text>
+        <View style={styles.addressAndCallContainer}>
+          <View style={styles.ratesContainer}>
+            <Text style={styles.rateText}>Making Charges: {shop.makingCharges}%</Text>
+            <Text style={styles.rateText}>Gold Rate: ₹{shop.goldRate}/g</Text>
+          </View>
+          <TouchableOpacity 
+            style={styles.callButton}
+            onPress={() => handleCallPress(shop.phone)}
+          >
+            <Icon name="call" size={24} color="#fff" />
+          </TouchableOpacity>
         </View>
       </View>
 
@@ -180,13 +173,23 @@ const styles = StyleSheet.create({
   detailsContainer: {
     padding: 15,
   },
+  addressAndCallContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between'
+  },
+  callButton: {
+    backgroundColor: '#007AFF',
+    alignItems: 'center',
+    justifyContent: 'center',
+    height: 50,
+    width: 50,
+    borderRadius: 8
+  },
   address: {
     fontSize: 16,
     marginBottom: 10,
   },
   ratesContainer: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
     marginBottom: 15,
   },
   rateText: {

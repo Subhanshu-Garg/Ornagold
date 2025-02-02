@@ -11,6 +11,7 @@ export interface Shop {
   google_map_link: string;
   gallery: string[];
   reviews: Review[];
+  phone: string;
 }
 
 export interface Review {

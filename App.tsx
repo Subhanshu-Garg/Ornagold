@@ -14,7 +14,14 @@ export default function App() {
         <Stack.Screen 
           name="Home" 
           component={HomeScreen}
-          options={{ title: 'OrnaGold' }}
+          options={{ 
+            title: 'OrnaGold',
+            headerTitleAlign: 'left',
+            headerStyle: {
+              backgroundColor: '#ffffff',
+            },
+            headerShadowVisible: false,
+          }}
         />
         <Stack.Screen 
           name="Shop" 
