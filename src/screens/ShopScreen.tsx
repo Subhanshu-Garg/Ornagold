@@ -7,12 +7,13 @@ import {
   TextInput,
   TouchableOpacity,
   Keyboard,
+  Button,
+  Linking,
 } from 'react-native';
 import { RouteProp } from '@react-navigation/native';
 import MapView, { Marker } from 'react-native-maps';
 import { RootStackParamList } from '../types';
-import { WebView } from 'react-native-webview';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { useAuth } from '../contexts/AuthContext';
 
 
 type ShopScreenProps = {
@@ -25,6 +26,7 @@ export default function ShopScreen({ route }: ShopScreenProps) {
   const [reviews, setReviews] = useState(shop.reviews);
   const [rating, setRating] = useState(0);
   const [submitReviewWarning, setsubmitReviewWarning] = useState('')
+  const { requireAuth } = useAuth();
 
   const handleSubmitReview = () => {
     Keyboard.dismiss()
@@ -54,6 +56,21 @@ export default function ShopScreen({ route }: ShopScreenProps) {
     setNewReview('');
   };
 
+  const handleCall = async () => {
+    try {
+      const phoneNumber = `tel:${shop.phone}`;
+      const supported = await Linking.canOpenURL(phoneNumber);
+      console.log('phoneNumber', phoneNumber)
+      if (supported) {
+        await Linking.openURL(phoneNumber);
+      } else {
+        console.info('Phone calls are not supported on this device');
+      }
+    } catch (error) {
+      console.error('Error making call:', error);
+    }
+  };
+
   const StarRating = () => {
     return (
       <View style={styles.ratingTitleContainer}>
@@ -78,90 +95,81 @@ export default function ShopScreen({ route }: ShopScreenProps) {
   };
 
   return (
-    <ScrollView style={styles.container}>
-      <View style={styles.mapContainer}>
-        <MapView
-          style={styles.map}
-          loadingEnabled
-          initialRegion={{
-            latitude: shop.latitude,
-            longitude: shop.longitude,
-            latitudeDelta: 0.01,
-            longitudeDelta: 0.01,
-          }}
-        >
-          <Marker
-            coordinate={{
+    <View style={{ flex: 1 }}>
+      <ScrollView style={styles.container}>
+        <View style={styles.mapContainer}>
+          <MapView
+            style={styles.map}
+            loadingEnabled
+            initialRegion={{
               latitude: shop.latitude,
               longitude: shop.longitude,
+              latitudeDelta: 0.01,
+              longitudeDelta: 0.01,
             }}
-            title={shop.name}
-          />
-        </MapView>
-        
-        {/* <WebView
-          style={styles.map}
-          source={{ 
-            html: `
-              <iframe 
-                src="${shop.google_map_link}" 
-                width="100%" 
-                height="200" 
-                style="border:0;" 
-                loading="lazy" 
-                referrerpolicy="no-referrer-when-downgrade">
-              </iframe>
-            `
-          }}
-          javaScriptEnabled={true}
-          domStorageEnabled={true}
-          scalesPageToFit={false}
-        /> */}
-      </View>
-
-      <View style={styles.detailsContainer}>
-        <Text style={styles.address}>{shop.address}</Text>
-        <View style={styles.ratesContainer}>
-          <Text style={styles.rateText}>Making Charges: {shop.makingCharges}%</Text>
-          <Text style={styles.rateText}>Gold Rate: ₹{shop.goldRate}/g</Text>
-        </View>
-      </View>
-
-      <View style={styles.separator} />
-      <View style={styles.addReviewContainer}>
-        <StarRating />
-        <View style={styles.inputButtonContainer}>
-          <TextInput
-            style={styles.reviewInput}
-            placeholder="Write your review..."
-            value={newReview}
-            onChangeText={setNewReview}
-            multiline
-          />
-          <TouchableOpacity
-            style={styles.submitButton}
-            onPress={handleSubmitReview}
           >
-            <Text style={styles.submitButtonText}>Submit</Text>
-          </TouchableOpacity>
+            <Marker
+              coordinate={{
+                latitude: shop.latitude,
+                longitude: shop.longitude,
+              }}
+              title={shop.name}
+            />
+          </MapView>
         </View>
-        <Text style={[styles.warningText, !submitReviewWarning && styles.hiddenWarning]}>
-          {submitReviewWarning}
-        </Text>
-      </View>
 
-      <View style={styles.separator} />
-      <View style={styles.reviewsContainer}>
-        <Text style={styles.sectionTitle}>Reviews</Text>
-        {reviews.map((review) => (
-          <View key={review.id} style={styles.reviewItem}>
-            <Text style={styles.reviewUser}>{review.userName}</Text>
-            <Text style={styles.reviewRating}>Rating: {review.rating}/5</Text>
-            <Text style={styles.reviewComment}>{review.comment}</Text>
+        <View style={styles.detailsContainer}>
+          <Text style={styles.address}>{shop.address}</Text>
+          <View style={styles.ratesContainer}>
+            <Text style={styles.rateText}>Making Charges: {shop.makingCharges}%</Text>
+            <Text style={styles.rateText}>Gold Rate: ₹{shop.goldRate}/g</Text>
           </View>
-        ))}
+        </View>
+
+        <View style={styles.separator} />
+        <View style={styles.addReviewContainer}>
+          <StarRating />
+          <View style={styles.inputButtonContainer}>
+            <TextInput
+              style={styles.reviewInput}
+              placeholder="Write your review..."
+              value={newReview}
+              onChangeText={setNewReview}
+              multiline
+            />
+            <TouchableOpacity
+              style={styles.submitButton}
+              onPress={handleSubmitReview}
+            >
+              <Text style={styles.submitButtonText}>Submit</Text>
+            </TouchableOpacity>
+          </View>
+          <Text style={[styles.warningText, !submitReviewWarning && styles.hiddenWarning]}>
+            {submitReviewWarning}
+          </Text>
+        </View>
+
+        <View style={styles.separator} />
+        <View style={styles.reviewsContainer}>
+          <Text style={styles.sectionTitle}>Reviews</Text>
+          {reviews.map((review) => (
+            <View key={review.id} style={styles.reviewItem}>
+              <Text style={styles.reviewUser}>{review.userName}</Text>
+              <Text style={styles.reviewRating}>Rating: {review.rating}/5</Text>
+              <Text style={styles.reviewComment}>{review.comment}</Text>
+            </View>
+          ))}
+        </View>
+      </ScrollView>
+      
+      <View style={styles.fixedButtonContainer}>
+        <Button 
+          title="Call Shop" 
+          onPress={() => requireAuth(handleCall)}
+          color="#007AFF"
+        />
       </View>
-    </ScrollView>
+    </View>
   );
 }
 
@@ -285,5 +293,19 @@ const styles = StyleSheet.create({
   hiddenWarning: {
     height: 0, // Make it disappear when empty
     opacity: 0, // Hide the text
+  },
+  fixedButtonContainer: {
+    position: 'absolute',
+    bottom: 20,
+    left: 20,
+    right: 20,
+    backgroundColor: 'white',
+    borderRadius: 8,
+    paddingHorizontal: 20,
+    elevation: 3,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 2,
   },
 });

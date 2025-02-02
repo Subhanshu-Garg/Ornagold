@@ -1,10 +1,11 @@
 import React, { useState } from 'react';
-import { StyleSheet, View, SafeAreaView } from 'react-native';
+import { StyleSheet, View, SafeAreaView, TouchableOpacity, Text } from 'react-native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { RootStackParamList, Shop } from '../types';
 import SearchBar from '../components/SearchBar';
 import ShopList from '../components/ShopList';
 import { mockShops } from '../data/mockData';
+import { useAuth } from '../contexts/AuthContext';
 
 type HomeScreenProps = {
   navigation: NativeStackNavigationProp<RootStackParamList, 'Home'>;
@@ -12,6 +13,20 @@ type HomeScreenProps = {
 
 export default function HomeScreen({ navigation }: HomeScreenProps) {
   const [searchQuery, setSearchQuery] = useState('');
+  const { signOut } = useAuth();
+
+  React.useLayoutEffect(() => {
+    navigation.setOptions({
+      headerRight: () => (
+        <TouchableOpacity
+          onPress={signOut}
+          style={{ marginRight: 15 }}
+        >
+          <Text style={{ color: '#007AFF', fontSize: 16 }}>Logout</Text>
+        </TouchableOpacity>
+      ),
+    });
+  }, [navigation, signOut]);
 
   const filteredShops = mockShops.filter(shop => 
     shop.name.toLowerCase().includes(searchQuery.toLowerCase()) ||

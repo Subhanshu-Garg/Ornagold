@@ -9,6 +9,7 @@ export const mockShops: Shop[] = [
     goldRate: 5500, // ₹ per gram
     latitude: 18.9517,
     longitude: 72.8332,
+    phone: '7011564838',
     address: 'Shop No. 5, Zaveri Bazaar, Bhuleshwar, Mumbai 400002',
     google_map_link: 'https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d7471839.584548672!2d69.96201888374144!3d23.876879201973956!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3be7ce1873f5319b%3A0x91bea31735c8675f!2sAabhushan!5e0!3m2!1sen!2sin!4v1738431839850!5m2!1sen!2sin',
     logo_img: 'https://content.jdmagicbox.com/v2/comp/patiala/a5/9999px175.x175.240426030249.a4a5/catalogue/malabar-gold-and-diamonds-patiala-cantt-patiala-jewellery-dealers-malabar-gold-and-diamonds-pil2csv11r.jpg',
