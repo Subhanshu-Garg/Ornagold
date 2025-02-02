@@ -44,35 +44,35 @@ CREATE TABLE IF NOT EXISTS shops (
     id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
     name text NOT NULL,
     address text NOT NULL,
-    mobile_number text NOT NULL,
-    logo_image text,
-    making_charges text NOT NULL,
-    gold_rate text NOT NULL,
+    phone text NOT NULL,
+    "logoImage" text,
+    "makingCharges" text NOT NULL,
+    "goldRate" text NOT NULL,
     latitude double precision NOT NULL,
     longitude double precision NOT NULL,
     locality text NOT NULL,
     gallery text[],
-    created_at timestamptz DEFAULT now(),
-    updated_at timestamptz DEFAULT now(),
+    "createdAt" timestamptz DEFAULT now(),
+    "updatedAt" timestamptz DEFAULT now(),
     location geography(POINT) GENERATED ALWAYS AS (ST_SetSRID(ST_MakePoint(longitude, latitude), 4326)) STORED
 );
 
 -- Create reviews table
 CREATE TABLE IF NOT EXISTS reviews (
     id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
-    shop_id uuid REFERENCES shops(id) ON DELETE CASCADE,
-    user_id uuid REFERENCES auth.users(id) ON DELETE CASCADE,
-    user_name text NOT NULL,
+    "shopId" uuid REFERENCES shops(id) ON DELETE CASCADE,
+    "userId" uuid REFERENCES auth.users(id) ON DELETE CASCADE,
+    "displayName" text,
     rating integer NOT NULL CHECK (rating >= 1 AND rating <= 5),
     comment text NOT NULL,
-    created_at timestamptz DEFAULT now()
+    "createdAt" timestamptz DEFAULT now()
 );
 
 -- Create shop owners junction table
 CREATE TABLE IF NOT EXISTS shop_owners (
-    shop_id uuid REFERENCES shops(id) ON DELETE CASCADE,
-    user_id uuid REFERENCES auth.users(id) ON DELETE CASCADE,
-    PRIMARY KEY (shop_id, user_id)
+    "shopId" uuid REFERENCES shops(id) ON DELETE CASCADE,
+    "userId" uuid REFERENCES auth.users(id) ON DELETE CASCADE,
+    PRIMARY KEY ("shopId", "userId")
 );
 
 -- Enable Row Level Security
@@ -97,9 +97,9 @@ CREATE POLICY "Allow shop owners to update their shops"
     FOR UPDATE
     TO authenticated
     USING (auth.uid() IN (
-        SELECT user_id
+        SELECT "userId"
         FROM shop_owners
-        WHERE shop_id = id
+        WHERE "shopId" = id
     ));
 
 CREATE POLICY "Allow shop owners to delete their shops"
@@ -107,9 +107,9 @@ CREATE POLICY "Allow shop owners to delete their shops"
     FOR DELETE
     TO authenticated
     USING (auth.uid() IN (
-        SELECT user_id
+        SELECT "userId"
         FROM shop_owners
-        WHERE shop_id = id
+        WHERE "shopId" = id
     ));
 
 -- Create policies for reviews
@@ -123,13 +123,13 @@ CREATE POLICY "Allow authenticated users to create reviews"
     ON reviews
     FOR INSERT
     TO authenticated
-    WITH CHECK (auth.uid() = user_id);
+    WITH CHECK (auth.uid() = "userId");
 
 -- Create function to find nearby shops
-CREATE OR REPLACE FUNCTION get_nearby_shops(
-    lat double precision,
-    lng double precision,
-    radius_km double precision
+CREATE OR REPLACE FUNCTION "getNearbyShops"(
+    "lat" double precision,
+    "lng" double precision,
+    "radiusKm" double precision
 )
 RETURNS SETOF shops
 LANGUAGE sql
@@ -139,10 +139,10 @@ AS $$
     FROM shops
     WHERE ST_DWithin(
         location,
-        ST_SetSRID(ST_MakePoint(lng, lat), 4326)::geography,
-        radius_km * 1000
+        ST_SetSRID(ST_MakePoint("lng", "lat"), 4326)::geography,
+        "radiusKm" * 1000
     )
-    ORDER BY location <-> ST_SetSRID(ST_MakePoint(lng, lat), 4326)::geography;
+    ORDER BY location <-> ST_SetSRID(ST_MakePoint("lng", "lat"), 4326)::geography;
 $$;
 
 -- Create index for spatial queries
