@@ -15,7 +15,7 @@ export default function ShopList({ shops, onShopPress }: ShopListProps) {
     >
       <Image
         style={styles.shopImage}
-        source={{ uri: item.logo_img }}
+        source={{ uri: item.logoImage }}
         resizeMode="cover"
       />
       <View style={styles.textContainer}>

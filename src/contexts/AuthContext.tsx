@@ -33,7 +33,6 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         } else {
           await AsyncStorage.removeItem('supabaseSession');
         }
-        console.log('Session', session)
         setUser(session?.user ?? null);
         setLoading(false);
       }

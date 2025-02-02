@@ -10,18 +10,19 @@ export interface Shop {
   latitude: number;
   longitude: number;
   address: string;
-  logo_img: string;
+  logoImage: string;
   google_map_link: string;
   gallery: string[];
-  reviews: Review[];
 }
 
 export interface Review {
   id: string;
-  userName: string;
   rating: number;
+  shopId: string;
+  userId: string;
+  userName: string;
   comment: string;
-  date: string;
+  createdAt: string;
 }
 
 

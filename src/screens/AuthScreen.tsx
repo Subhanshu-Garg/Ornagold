@@ -24,7 +24,7 @@ type AuthScreenProps = {
 export default function AuthScreen({ route, navigation }: AuthScreenProps) {
   const [isLogin, setIsLogin] = useState(true);
 
-  const { loading } = useAuth();
+  const { loading, authError } = useAuth();
 
   if (loading) {
     return <LoadingSpinner />;

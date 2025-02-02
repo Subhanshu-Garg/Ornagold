@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect, useCallback } from 'react';
 import {
   StyleSheet,
   View,
@@ -13,9 +13,15 @@ import {
 import { RouteProp } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import MapView, { Marker } from 'react-native-maps';
-import { RootStackParamList } from '../types';
+import { Review, RootStackParamList } from '../types';
 import { Icon } from 'react-native-elements';
 import useProtectedAction from '../hooks/useProtectedAction';
+import { getShopReviews, submitShopReview } from '../services/reviews';
+import { errorHandler } from '../utils/errorHandler';
+import { User } from '@supabase/supabase-js';
+import { useAuth } from '../contexts/AuthContext';
+import useAsync from '../hooks/useAsync';
+import LoadingSpinner from '../components/LoadingSpinner';
 
 type ShopScreenProps = {
   route: RouteProp<RootStackParamList, 'Shop'>;
@@ -23,39 +29,61 @@ type ShopScreenProps = {
 };
 
 export default function ShopScreen({ route, navigation }: ShopScreenProps) {
-  const { shop } = route.params;
+  const { shop: initialShop } = route.params;
+  const [shop, setShop] = useState(initialShop);
   const [newReview, setNewReview] = useState('');
-  const [reviews, setReviews] = useState(shop.reviews);
   const [rating, setRating] = useState(0);
-  const [submitReviewWarning, setsubmitReviewWarning] = useState('')
+  const [submitReviewWarning, setSubmitReviewWarning] = useState('');
+  const { user } = useAuth();
   const protectedAction = useProtectedAction();
 
-  const handleSubmitReview = () => {
-    Keyboard.dismiss()
-    setsubmitReviewWarning('')
-    if (newReview.trim() === '') {
-      setsubmitReviewWarning('Please enter review.')
-      return
-    } // Don't submit empty reviews
-    if (rating === 0) {
-      setsubmitReviewWarning('Please give the rating.')
-      return
-    }
-    // Add the new review
-    setReviews([
-      {
-        id: (reviews.length + 1).toString(),
-        userName: 'New User',
-        rating,
-        comment: newReview,
-        date: new Date().toLocaleDateString(),
-      },
-      ...reviews,
-    ]);
+  // Using the custom hook for reviews
+  const {
+    data: reviews,
+    isLoading: isLoadingReviews,
+    execute: fetchReviews
+  } = useAsync<Review[]>(useCallback(async () => {
+    return getShopReviews(shop.id);
+  }, [shop.id]));
 
-    // Reset the form
-    setRating(0);
-    setNewReview('');
+  // Initial fetch
+  useEffect(() => {
+    fetchReviews();
+  }, [fetchReviews]);
+
+  const handleSubmitReview = async () => {
+    Keyboard.dismiss();
+    setSubmitReviewWarning('');
+    
+    if (newReview.trim() === '') {
+      setSubmitReviewWarning('Please enter review.');
+      return;
+    }
+    
+    if (rating === 0) {
+      setSubmitReviewWarning('Please give the rating.');
+      return;
+    }
+
+    protectedAction(async () => {
+      try {
+        const review: Partial<Review> = {
+          userId: user?.id,
+          rating,
+          shopId: shop.id,
+          userName: user?.email,
+          comment: newReview
+        };
+
+        await submitShopReview(shop.id, review);
+        await fetchReviews(); // Refresh reviews using the hook
+        setRating(0);
+        setNewReview('');
+      } catch (error) {
+        console.error('Error while submitting review', error);
+        errorHandler.handle(error, 'submit_review');
+      }
+    });
   };
 
   const StarRating = () => {
@@ -95,6 +123,9 @@ export default function ShopScreen({ route, navigation }: ShopScreenProps) {
     }
   };
 
+  if(isLoadingReviews) {
+    return <LoadingSpinner />
+  }
 
   return (
     <ScrollView style={styles.container}>
@@ -161,7 +192,7 @@ export default function ShopScreen({ route, navigation }: ShopScreenProps) {
       <View style={styles.separator} />
       <View style={styles.reviewsContainer}>
         <Text style={styles.sectionTitle}>Reviews</Text>
-        {reviews.map((review) => (
+        {reviews?.map((review) => (
           <View key={review.id} style={styles.reviewItem}>
             <Text style={styles.reviewUser}>{review.userName}</Text>
             <Text style={styles.reviewRating}>Rating: {review.rating}/5</Text>

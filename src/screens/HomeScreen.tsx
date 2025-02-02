@@ -1,4 +1,4 @@
-import React, { useState, useLayoutEffect } from 'react';
+import React, { useState, useLayoutEffect, useEffect } from 'react';
 import { StyleSheet, View, SafeAreaView, TouchableOpacity, Text } from 'react-native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { RootStackParamList, Shop } from '../types';
@@ -8,6 +8,8 @@ import { mockShops } from '../data/mockData';
 import { Icon } from 'react-native-elements';
 import { useAuth } from '../contexts/AuthContext';
 import LoadingSpinner from '../components/LoadingSpinner';
+import { getShops } from '../services/shops';
+import { errorHandler } from '../utils/errorHandler';
 
 type HomeScreenProps = {
   navigation: NativeStackNavigationProp<RootStackParamList, 'Home'>;
@@ -17,6 +19,9 @@ export default function HomeScreen({ navigation }: HomeScreenProps) {
   const [searchQuery, setSearchQuery] = useState('');
   const { user, loading, signOut } = useAuth()
   const [isProcessing, setIsProcessing] = useState(false);
+  const [shops, setShops] = useState<Shop[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState<Error | null>(null);
 
   useLayoutEffect(() => {
     const iconName = user ? 'logout' : 'login'
@@ -44,7 +49,24 @@ export default function HomeScreen({ navigation }: HomeScreenProps) {
     });
   }, [navigation, user, isProcessing]);
 
-  const filteredShops = mockShops.filter(shop => 
+  useEffect(() => {
+    const fetchShops = async () => {
+      try {
+        const shopsData = await getShops();
+        setShops(shopsData);
+      } catch (error) {
+        console.log(error)
+        const normalizedError = errorHandler.handle(error, 'fetching_shops');
+        setError(normalizedError);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchShops();
+  }, []);
+
+  const filteredShops = shops.filter(shop => 
     shop.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
     shop.locality.toLowerCase().includes(searchQuery.toLowerCase())
   );
@@ -75,7 +97,7 @@ export default function HomeScreen({ navigation }: HomeScreenProps) {
     }
   };
 
-  if(loading) {
+  if(loading || isLoading) {
     return <LoadingSpinner />
   }
 

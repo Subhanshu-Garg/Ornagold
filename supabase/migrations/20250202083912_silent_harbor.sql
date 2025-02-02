@@ -1,104 +1,153 @@
 /*
-  # Create profiles and shops tables
+  # Gold Platform Database Schema
 
   1. New Tables
-    - `profiles`
-      - `id` (uuid, primary key, references auth.users)
-      - `email` (text)
-      - `full_name` (text)
-      - `is_shop_owner` (boolean)
-      - `created_at` (timestamp)
-      - `updated_at` (timestamp)
-    
     - `shops`
       - `id` (uuid, primary key)
-      - `owner_id` (uuid, references profiles)
-      - All existing shop fields from the mock data
-  
+      - `name` (text)
+      - `address` (text)
+      - `mobile_number` (text)
+      - `logo_image` (text, URL)
+      - `making_charges` (text)
+      - `gold_rate` (text)
+      - `latitude` (double precision)
+      - `longitude` (double precision)
+      - `locality` (text)
+      - `gallery` (text[], array of image URLs)
+      - `created_at` (timestamptz)
+      - `updated_at` (timestamptz)
+
+    - `reviews`
+      - `id` (uuid, primary key)
+      - `shop_id` (uuid, foreign key)
+      - `user_id` (uuid, foreign key to auth.users)
+      - `user_name` (text)
+      - `rating` (integer)
+      - `comment` (text)
+      - `created_at` (timestamptz)
+
   2. Security
     - Enable RLS on both tables
-    - Add policies for reading and managing profiles and shops
+    - Add policies for public read access
+    - Add policies for authenticated users to create reviews
+    - Add policies for shop owners to manage their shops
+
+  3. Functions
+    - Create function for finding nearby shops using PostGIS
 */
 
--- Create profiles table
-CREATE TABLE IF NOT EXISTS profiles (
-  id uuid PRIMARY KEY REFERENCES auth.users,
-  email text NOT NULL,
-  full_name text,
-  is_shop_owner boolean DEFAULT false,
-  created_at timestamptz DEFAULT now(),
-  updated_at timestamptz DEFAULT now()
-);
+-- Enable PostGIS extension
+CREATE EXTENSION IF NOT EXISTS postgis;
 
--- Create shops table with all fields
+-- Create shops table
 CREATE TABLE IF NOT EXISTS shops (
-  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
-  owner_id uuid REFERENCES profiles(id) NOT NULL,
-  name text NOT NULL,
-  locality text NOT NULL,
-  making_charges numeric NOT NULL,
-  gold_rate numeric NOT NULL,
-  latitude numeric NOT NULL,
-  longitude numeric NOT NULL,
-  address text NOT NULL,
-  gallery text[] DEFAULT '{}',
-  created_at timestamptz DEFAULT now(),
-  updated_at timestamptz DEFAULT now()
+    id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+    name text NOT NULL,
+    address text NOT NULL,
+    mobile_number text NOT NULL,
+    logo_image text,
+    making_charges text NOT NULL,
+    gold_rate text NOT NULL,
+    latitude double precision NOT NULL,
+    longitude double precision NOT NULL,
+    locality text NOT NULL,
+    gallery text[],
+    created_at timestamptz DEFAULT now(),
+    updated_at timestamptz DEFAULT now(),
+    location geography(POINT) GENERATED ALWAYS AS (ST_SetSRID(ST_MakePoint(longitude, latitude), 4326)) STORED
 );
 
 -- Create reviews table
 CREATE TABLE IF NOT EXISTS reviews (
-  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
-  shop_id uuid REFERENCES shops(id) NOT NULL,
-  user_id uuid REFERENCES profiles(id) NOT NULL,
-  rating numeric NOT NULL CHECK (rating >= 1 AND rating <= 5),
-  comment text,
-  created_at timestamptz DEFAULT now()
+    id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
+    shop_id uuid REFERENCES shops(id) ON DELETE CASCADE,
+    user_id uuid REFERENCES auth.users(id) ON DELETE CASCADE,
+    user_name text NOT NULL,
+    rating integer NOT NULL CHECK (rating >= 1 AND rating <= 5),
+    comment text NOT NULL,
+    created_at timestamptz DEFAULT now()
 );
 
--- Enable RLS
-ALTER TABLE profiles ENABLE ROW LEVEL SECURITY;
+-- Create shop owners junction table
+CREATE TABLE IF NOT EXISTS shop_owners (
+    shop_id uuid REFERENCES shops(id) ON DELETE CASCADE,
+    user_id uuid REFERENCES auth.users(id) ON DELETE CASCADE,
+    PRIMARY KEY (shop_id, user_id)
+);
+
+-- Enable Row Level Security
 ALTER TABLE shops ENABLE ROW LEVEL SECURITY;
 ALTER TABLE reviews ENABLE ROW LEVEL SECURITY;
 
--- Profiles policies
-CREATE POLICY "Public profiles are viewable by everyone"
-  ON profiles FOR SELECT
-  USING (true);
+-- Create policies for shops
+CREATE POLICY "Allow public read access to shops"
+    ON shops
+    FOR SELECT
+    TO public
+    USING (true);
 
-CREATE POLICY "Users can update their own profile"
-  ON profiles FOR UPDATE
-  USING (auth.uid() = id);
+CREATE POLICY "Allow authenticated users to create shops"
+    ON shops
+    FOR INSERT
+    TO authenticated
+    WITH CHECK (true);
 
--- Shops policies
-CREATE POLICY "Shops are viewable by everyone"
-  ON shops FOR SELECT
-  USING (true);
+CREATE POLICY "Allow shop owners to update their shops"
+    ON shops
+    FOR UPDATE
+    TO authenticated
+    USING (auth.uid() IN (
+        SELECT user_id
+        FROM shop_owners
+        WHERE shop_id = id
+    ));
 
-CREATE POLICY "Shop owners can insert their shops"
-  ON shops FOR INSERT
-  WITH CHECK (
-    auth.uid() = owner_id
-    AND EXISTS (
-      SELECT 1 FROM profiles
-      WHERE id = auth.uid()
-      AND is_shop_owner = true
+CREATE POLICY "Allow shop owners to delete their shops"
+    ON shops
+    FOR DELETE
+    TO authenticated
+    USING (auth.uid() IN (
+        SELECT user_id
+        FROM shop_owners
+        WHERE shop_id = id
+    ));
+
+-- Create policies for reviews
+CREATE POLICY "Allow public read access to reviews"
+    ON reviews
+    FOR SELECT
+    TO public
+    USING (true);
+
+CREATE POLICY "Allow authenticated users to create reviews"
+    ON reviews
+    FOR INSERT
+    TO authenticated
+    WITH CHECK (auth.uid() = user_id);
+
+-- Create function to find nearby shops
+CREATE OR REPLACE FUNCTION get_nearby_shops(
+    lat double precision,
+    lng double precision,
+    radius_km double precision
+)
+RETURNS SETOF shops
+LANGUAGE sql
+STABLE
+AS $$
+    SELECT *
+    FROM shops
+    WHERE ST_DWithin(
+        location,
+        ST_SetSRID(ST_MakePoint(lng, lat), 4326)::geography,
+        radius_km * 1000
     )
-  );
+    ORDER BY location <-> ST_SetSRID(ST_MakePoint(lng, lat), 4326)::geography;
+$$;
 
-CREATE POLICY "Shop owners can update their own shops"
-  ON shops FOR UPDATE
-  USING (auth.uid() = owner_id);
+-- Create index for spatial queries
+CREATE INDEX IF NOT EXISTS shops_location_idx ON shops USING GIST (location);
 
--- Reviews policies
-CREATE POLICY "Reviews are viewable by everyone"
-  ON reviews FOR SELECT
-  USING (true);
-
-CREATE POLICY "Authenticated users can create reviews"
-  ON reviews FOR INSERT
-  WITH CHECK (auth.uid() = user_id);
-
-CREATE POLICY "Users can update their own reviews"
-  ON reviews FOR UPDATE
-  USING (auth.uid() = user_id);
+-- Create index for text search
+CREATE INDEX IF NOT EXISTS shops_name_idx ON shops USING GIN (to_tsvector('english', name));
+CREATE INDEX IF NOT EXISTS shops_locality_idx ON shops USING GIN (to_tsvector('english', locality));

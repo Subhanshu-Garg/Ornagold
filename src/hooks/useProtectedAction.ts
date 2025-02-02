@@ -8,7 +8,7 @@ const useProtectedAction = () => {
   const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
   const route = useRoute();
 
-  const protectedAction = (action: () => void) => {
+  const protectedAction = async (action: () => Promise<void>) => {
     if (!user) {
       navigation.navigate('Auth', { 
         redirect: {
@@ -18,7 +18,7 @@ const useProtectedAction = () => {
       });
       return;
     }
-    action();
+    await action();
   };
 
   return protectedAction;

@@ -6,6 +6,7 @@ import ShopScreen from './src/screens/ShopScreen';
 import { RootStackParamList } from './src/types';
 import AuthScreen from './src/screens/AuthScreen';
 import { AuthProvider } from './src/contexts/AuthContext';
+import { ErrorBoundary } from './src/components/ErrorBoundary';
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
 
@@ -42,9 +43,11 @@ function Navigation() {
 
 export default function App() {
   return (
-    <AuthProvider>
-      <Navigation />
-      {/* <AuthGate /> */}
-    </AuthProvider>
+    <ErrorBoundary>
+      <AuthProvider>
+        <Navigation />
+        {/* <AuthGate /> */}
+      </AuthProvider>
+    </ErrorBoundary>
   );
 }
