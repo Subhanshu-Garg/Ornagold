@@ -1,111 +1,152 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
-import { Session, User } from '@supabase/supabase-js';
+import { AuthError, Session, User } from '@supabase/supabase-js';
 import { supabase } from '../lib/supabase';
-import { AuthContextType } from '../types';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { AuthContextType, SignInParams, SignUpParams } from '../types';
 
 
 
-const AuthContext = createContext<AuthContextType | undefined>(undefined);
+const AuthContext = createContext<AuthContextType>({} as AuthContextType);
 
-export function AuthProvider({ children }: { children: React.ReactNode }) {
+export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [user, setUser] = useState<User | null>(null);
-  const [session, setSession] = useState<Session | null>(null);
   const [loading, setLoading] = useState(true);
-  const [pendingAction, setPendingAction] = useState<(() => Promise<void>) | null>(null);
+  const [authError, setAuthError] = useState<AuthError | null>(null);
 
   useEffect(() => {
-    // Check active sessions and subscribe to auth changes
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      setSession(session);
-      setUser(session?.user ?? null);
+    const loadSession = async () => {
+      const storedSession = await AsyncStorage.getItem('supabaseSession');
+      if (storedSession) {
+        const session = JSON.parse(storedSession);
+        setUser(session.user);
+      }
       setLoading(false);
-    });
+    };
 
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
-      setSession(session);
-      setUser(session?.user ?? null);
-      setLoading(false);
-    });
+    setLoading(true);
+    loadSession();
 
-    return () => subscription.unsubscribe();
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(
+      async (_event, session) => {
+        if (session) {
+          await AsyncStorage.setItem('supabaseSession', JSON.stringify(session));
+        } else {
+          await AsyncStorage.removeItem('supabaseSession');
+        }
+        console.log('Session', session)
+        setUser(session?.user ?? null);
+        setLoading(false);
+      }
+    );
+
+    return () => subscription?.unsubscribe();
   }, []);
 
-  const signUp = async (email: string, password: string, fullName: string, isShopOwner: boolean) => {
-    const { error: signUpError } = await supabase.auth.signUp({
-      email,
-      password,
-    });
-
-    if (signUpError) throw signUpError;
-
-    // Create profile after successful signup
-    const { error: profileError } = await supabase
-      .from('profiles')
-      .insert([
-        {
-          id: user?.id,
-          email,
-          full_name: fullName,
-          is_shop_owner: isShopOwner,
-        },
-      ]);
-
-    if (profileError) throw profileError;
-  };
-
-  const signIn = async (email: string, password: string) => {
-    const { error } = await supabase.auth.signInWithPassword({
-      email,
-      password,
-    });
-
-    if (error) throw error;
-  };
-
-  const signOut = async () => {
-    const { error } = await supabase.auth.signOut();
-    if (error) throw error;
-  };
-
-  const queueAction = (action: () => Promise<void>) => {
-    if (user) {
-      action();
-    } else {
-      setPendingAction(() => action);
+  const signIn = async (params: SignInParams) => {
+    setLoading(true);
+    setAuthError(null);
+    
+    try {
+      if (params.method === 'email') {
+        const { error } = await supabase.auth.signInWithPassword({
+          email: params.email,
+          password: params.password,
+        });
+        if (error) throw error;
+      }
+      else if (params.method === 'google') {
+        const { error } = await supabase.auth.signInWithOAuth({
+          provider: 'google',
+        });
+        if (error) throw error;
+      }
+      else if (params.method === 'otp') {
+        if (params.code) {
+          const { error } = await supabase.auth.verifyOtp({
+            phone: params.phone,
+            token: params.code,
+            type: 'sms',
+          });
+          if (error) throw error;
+        } else {
+          const { error } = await supabase.auth.signInWithOtp({
+            phone: params.phone
+          });
+          if (error) throw error;
+        }
+      }
+    } catch (error) {
+      setAuthError(error as AuthError);
+      throw error;
+    } finally {
+      setLoading(false);
     }
   };
 
-  const handleAuthSuccess = async () => {
-    if (pendingAction) {
-      await pendingAction();
-      setPendingAction(null);
+  const signUp = async (params: SignUpParams) => {
+    setLoading(true);
+    setAuthError(null);
+
+    try {
+      if (params.method === 'email') {
+        const { error } = await supabase.auth.signUp({
+          email: params.email,
+          password: params.password,
+        });
+        if (error) throw error;
+      }
+      else if (params.method === 'phone') {
+        if (params.code) {
+          const { error } = await supabase.auth.verifyOtp({
+            phone: params.phone,
+            token: params.code,
+            type: 'sms',
+          });
+          if (error) throw error;
+        } else {
+          const { error } = await supabase.auth.signUp({
+            phone: params.phone,
+            password: ''
+          });
+          if (error) throw error;
+        }
+      }
+    } catch (error) {
+      setAuthError(error as AuthError);
+      throw error;
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const signOut = async () => {
+    setLoading(true);
+    try {
+      const { error } = await supabase.auth.signOut();
+      if (error) throw error;
+      setUser(null);
+    } catch (error) {
+      setAuthError(error as AuthError);
+      throw error;
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
-    <AuthContext.Provider value={{
-      user,
-      session,
-      loading,
-      isAuthenticated: !!user,
-      queueAction,
-      signUp,
-      signIn,
-      signOut,
-      handleAuthSuccess
-    }}>
+    <AuthContext.Provider 
+      value={{ 
+        user, 
+        loading, 
+        signIn, 
+        signUp, 
+        signOut,
+        authError 
+      }}
+    >
       {children}
     </AuthContext.Provider>
   );
-}
+};
 
-export function useAuth() {
-  const context = useContext(AuthContext);
-  if (context === undefined) {
-    throw new Error('useAuth must be used within an AuthProvider');
-  }
-  return {
-    ...context,
-    requireAuth: context.queueAction
-  };
-}
+export const useAuth = () => useContext(AuthContext);

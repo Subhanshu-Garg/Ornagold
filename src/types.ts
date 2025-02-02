@@ -1,4 +1,4 @@
-import { Session, User } from "@supabase/supabase-js";
+import { AuthError, Session, User } from "@supabase/supabase-js";
 
 export interface Shop {
   id: string;
@@ -14,7 +14,6 @@ export interface Shop {
   google_map_link: string;
   gallery: string[];
   reviews: Review[];
-  phone: string;
 }
 
 export interface Review {
@@ -25,20 +24,34 @@ export interface Review {
   date: string;
 }
 
+
+export type SignInParams = 
+  | { method: 'email'; email: string; password: string }
+  | { method: 'google' }
+  | {
+    method: 'otp'; phone: string; code?: string 
+};
+
+export type SignUpParams =
+  | { method: 'email'; email: string; password: string }
+  | { method: 'phone'; phone: string; code?: string };
+
 export interface AuthContextType {
   user: User | null;
-  session: Session | null;
   loading: boolean;
-  isAuthenticated: boolean;
-  queueAction: (action: () => Promise<void>) => void | null;
-  signUp: (email: string, password: string, fullName: string, isShopOwner: boolean) => Promise<void>;
-  signIn: (email: string, password: string) => Promise<void>;
+  signIn: (params: SignInParams) => Promise<void>;
+  signUp: (params: SignUpParams) => Promise<void>;
   signOut: () => Promise<void>;
-  handleAuthSuccess: () => void;  
+  authError: AuthError | null;
 }
 
 export type RootStackParamList = {
   Home: undefined;
   Shop: { shop: Shop };
-  Auth: AuthContextType
+  Auth: { 
+    redirect?: {
+      screen: keyof RootStackParamList;
+      params: any
+    }
+  };
 };

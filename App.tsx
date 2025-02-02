@@ -4,20 +4,12 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import HomeScreen from './src/screens/HomeScreen';
 import ShopScreen from './src/screens/ShopScreen';
 import { RootStackParamList } from './src/types';
-import { AuthProvider, useAuth } from './src/contexts/AuthContext';
 import AuthScreen from './src/screens/AuthScreen';
-import LoadingSpinner from './src/components/LoadingSpinner';
-import AuthGate from './src/components/AuthGate';
+import { AuthProvider } from './src/contexts/AuthContext';
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
 
 function Navigation() {
-  const { user, loading } = useAuth();
-
-  if (loading) {
-    return <LoadingSpinner />;
-  }
-
   return (
     <NavigationContainer>
       <Stack.Navigator>
@@ -38,10 +30,11 @@ function Navigation() {
           component={ShopScreen}
           options={({ route }) => ({ title: route.params.shop.name })}
         />
-        {/* <Stack.Screen
+        <Stack.Screen
           name="Auth"
           component={AuthScreen}
-        /> */}
+          options={{ headerShown: false }}
+        />
       </Stack.Navigator>
     </NavigationContainer>
   );
