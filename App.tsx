@@ -7,12 +7,16 @@ import { RootStackParamList } from './src/types';
 import AuthScreen from './src/screens/AuthScreen';
 import { AuthProvider } from './src/contexts/AuthContext';
 import { ErrorBoundary } from './src/components/ErrorBoundary';
+import * as SplashScreen from 'expo-splash-screen';
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
 
+// Keep the splash screen visible while we load resources
+SplashScreen.preventAutoHideAsync();
+
 function Navigation() {
   return (
-    <NavigationContainer>
+    <NavigationContainer onReady={() => SplashScreen.hideAsync()}>
       <Stack.Navigator>
         <Stack.Screen 
           name="Home" 
@@ -46,7 +50,6 @@ export default function App() {
     <ErrorBoundary>
       <AuthProvider>
         <Navigation />
-        {/* <AuthGate /> */}
       </AuthProvider>
     </ErrorBoundary>
   );

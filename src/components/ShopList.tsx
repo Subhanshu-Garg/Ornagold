@@ -1,13 +1,20 @@
 import React from 'react';
-import { StyleSheet, View, FlatList, TouchableOpacity, Text, Image } from 'react-native';
+import { StyleSheet, View, FlatList, TouchableOpacity, Text, Image, ActivityIndicator } from 'react-native';
 import { Shop } from '../types';
 
 interface ShopListProps {
   shops: Shop[];
   onShopPress: (shop: Shop) => void;
+  onEndReached?: () => void;
+  hasMore?: boolean;
 }
 
-export default function ShopList({ shops, onShopPress }: ShopListProps) {
+export default function ShopList({ 
+  shops, 
+  onShopPress, 
+  onEndReached,
+  hasMore 
+}: ShopListProps) {
   const renderShopItem = ({ item }: { item: Shop }) => (
     <TouchableOpacity
       style={styles.shopItem}
@@ -35,6 +42,11 @@ export default function ShopList({ shops, onShopPress }: ShopListProps) {
       renderItem={renderShopItem}
       keyExtractor={(item) => item.id}
       contentContainerStyle={styles.listContainer}
+      onEndReached={onEndReached}
+      onEndReachedThreshold={0.5}
+      ListFooterComponent={
+        hasMore ? <ActivityIndicator size="small" color="#0000ff" /> : null
+      }
     />
   );
 }

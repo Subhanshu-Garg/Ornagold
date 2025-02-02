@@ -1,44 +1,33 @@
-import React, { createContext, useContext, useEffect, useState } from 'react';
+import React, { createContext, useContext, useEffect, useState, useMemo } from 'react';
 import { AuthError, Session, User } from '@supabase/supabase-js';
 import { supabase } from '../lib/supabase';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { AuthContextType, SignInParams, SignUpParams } from '../types';
-
-
+import * as SplashScreen from 'expo-splash-screen';
 
 const AuthContext = createContext<AuthContextType>({} as AuthContextType);
 
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
+  const [appReady, setAppReady] = useState(false);
   const [authError, setAuthError] = useState<AuthError | null>(null);
 
   useEffect(() => {
-    const loadSession = async () => {
-      const storedSession = await AsyncStorage.getItem('supabaseSession');
-      if (storedSession) {
-        const session = JSON.parse(storedSession);
-        setUser(session.user);
-      }
-      setLoading(false);
-    };
-
-    setLoading(true);
-    loadSession();
-
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      async (_event, session) => {
-        if (session) {
-          await AsyncStorage.setItem('supabaseSession', JSON.stringify(session));
-        } else {
-          await AsyncStorage.removeItem('supabaseSession');
-        }
+    async function initializeAuth() {
+      try {
+        const { data: { session }, error } = await supabase.auth.getSession();
         setUser(session?.user ?? null);
+      } catch (error) {
+        console.error('Auth initialization error:', error);
+      } finally {
         setLoading(false);
+        setAppReady(true);
+        await SplashScreen.hideAsync();
       }
-    );
+    }
 
-    return () => subscription?.unsubscribe();
+    initializeAuth();
   }, []);
 
   const signIn = async (params: SignInParams) => {
@@ -137,17 +126,21 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     }
   };
 
+  const value = useMemo(() => ({
+    user,
+    loading,
+    signIn,
+    signUp,
+    signOut,
+    authError
+  }), [user, loading, authError]);
+
+  if (!appReady) {
+    return null;
+  }
+
   return (
-    <AuthContext.Provider 
-      value={{ 
-        user, 
-        loading, 
-        signIn, 
-        signUp, 
-        signOut,
-        authError 
-      }}
-    >
+    <AuthContext.Provider value={value}>
       {children}
     </AuthContext.Provider>
   );

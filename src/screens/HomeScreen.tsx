@@ -16,11 +16,12 @@ type HomeScreenProps = {
 };
 
 export default function HomeScreen({ navigation }: HomeScreenProps) {
+  const [page, setPage] = useState(1);
+  const [hasMore, setHasMore] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
   const { user, loading, signOut } = useAuth()
   const [isProcessing, setIsProcessing] = useState(false);
   const [shops, setShops] = useState<Shop[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<Error | null>(null);
 
   useLayoutEffect(() => {
@@ -49,27 +50,39 @@ export default function HomeScreen({ navigation }: HomeScreenProps) {
     });
   }, [navigation, user, isProcessing]);
 
+  const loadShops = async (currentPage: number, query: string) => {
+    try {
+      const { shops: newShops, hasMore } = await getShops(
+        query || undefined,
+        currentPage
+      );
+      
+      setShops(prev => 
+        currentPage === 1 ? newShops : [...prev, ...newShops]
+      );
+      setHasMore(hasMore);
+    } catch (error) {
+      errorHandler.handle(error, 'shop_list');
+    }
+  };
+
+  // Handle search with debounce
   useEffect(() => {
-    const fetchShops = async () => {
-      try {
-        const shopsData = await getShops();
-        setShops(shopsData);
-      } catch (error) {
-        console.log(error)
-        const normalizedError = errorHandler.handle(error, 'fetching_shops');
-        setError(normalizedError);
-      } finally {
-        setIsLoading(false);
-      }
-    };
+    const debounceTimer = setTimeout(() => {
+      setPage(1);
+      loadShops(1, searchQuery);
+    }, 500);
 
-    fetchShops();
-  }, []);
+    return () => clearTimeout(debounceTimer);
+  }, [searchQuery]);
 
-  const filteredShops = shops.filter(shop => 
-    shop.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    shop.locality.toLowerCase().includes(searchQuery.toLowerCase())
-  );
+  // Load more shops
+  const handleLoadMore = () => {
+    if (hasMore) {
+      setPage(prev => prev + 1);
+      loadShops(page + 1, searchQuery);
+    }
+  };
 
   const handleShopPress = (shop: Shop) => {
     navigation.navigate('Shop', { shop });
@@ -97,19 +110,21 @@ export default function HomeScreen({ navigation }: HomeScreenProps) {
     }
   };
 
-  if(loading || isLoading) {
+  if(loading) {
     return <LoadingSpinner />
-  }
+  } 
 
   return (
     <SafeAreaView style={styles.container}>
       <SearchBar
-          value={searchQuery}
-          onChangeText={setSearchQuery}
-        />
-      <ShopList
-        shops={filteredShops}
+        value={searchQuery}
+        onChangeText={setSearchQuery}
+      />
+      <ShopList 
+        shops={shops}
         onShopPress={handleShopPress}
+        onEndReached={handleLoadMore}
+        hasMore={hasMore}
       />
     </SafeAreaView>
   );
