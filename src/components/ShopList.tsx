@@ -1,5 +1,5 @@
 import React from 'react';
-import { StyleSheet, View, FlatList, TouchableOpacity, Text } from 'react-native';
+import { StyleSheet, View, FlatList, TouchableOpacity, Text, Image } from 'react-native';
 import { Shop } from '../types';
 
 interface ShopListProps {
@@ -13,11 +13,18 @@ export default function ShopList({ shops, onShopPress }: ShopListProps) {
       style={styles.shopItem}
       onPress={() => onShopPress(item)}
     >
-      <Text style={styles.shopName}>{item.name}</Text>
-      <Text style={styles.shopLocality}>{item.locality}</Text>
-      <View style={styles.ratesContainer}>
-        <Text>Making Charges: {item.makingCharges}%</Text>
-        <Text>Gold Rate: ₹{item.goldRate}/g</Text>
+      <Image
+        style={styles.shopImage}
+        source={{ uri: item.logo_img }}
+        resizeMode="cover"
+      />
+      <View style={styles.textContainer}>
+        <Text style={styles.shopName}>{item.name}</Text>
+        {/* <Text style={styles.shopLocality}>{item.locality}</Text> */}
+        <View style={styles.ratesContainer}>
+          <Text>Making Charges: {item.makingCharges}%</Text>
+          <Text>Gold Rate: ₹{item.goldRate}/g</Text>
+        </View>
       </View>
     </TouchableOpacity>
   );
@@ -46,6 +53,16 @@ const styles = StyleSheet.create({
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
     shadowRadius: 4,
+    flexDirection: 'row',
+  },
+  shopImage: {
+    width: 70,
+    height: 70,
+    borderRadius: 8,
+    marginRight: 15,
+  },
+  textContainer: {
+    flex: 1,
   },
   shopName: {
     fontSize: 18,
@@ -57,7 +74,7 @@ const styles = StyleSheet.create({
   },
   ratesContainer: {
     marginTop: 8,
-    flexDirection: 'row',
+    flexDirection: 'column',
     justifyContent: 'space-between',
   },
 });

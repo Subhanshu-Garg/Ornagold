@@ -11,6 +11,9 @@ import {
 import { RouteProp } from '@react-navigation/native';
 import MapView, { Marker } from 'react-native-maps';
 import { RootStackParamList } from '../types';
+import { WebView } from 'react-native-webview';
+import { SafeAreaView } from 'react-native-safe-area-context';
+
 
 type ShopScreenProps = {
   route: RouteProp<RootStackParamList, 'Shop'>;
@@ -75,72 +78,90 @@ export default function ShopScreen({ route }: ShopScreenProps) {
   };
 
   return (
-    <View style={styles.container}>
-      <ScrollView style={styles.container}>
-        <View style={styles.mapContainer}>
-          <MapView
-            style={styles.map}
-            initialRegion={{
+    <ScrollView style={styles.container}>
+      <View style={styles.mapContainer}>
+        <MapView
+          style={styles.map}
+          loadingEnabled
+          initialRegion={{
+            latitude: shop.latitude,
+            longitude: shop.longitude,
+            latitudeDelta: 0.01,
+            longitudeDelta: 0.01,
+          }}
+        >
+          <Marker
+            coordinate={{
               latitude: shop.latitude,
               longitude: shop.longitude,
-              latitudeDelta: 0.01,
-              longitudeDelta: 0.01,
             }}
+            title={shop.name}
+          />
+        </MapView>
+        
+        {/* <WebView
+          style={styles.map}
+          source={{ 
+            html: `
+              <iframe 
+                src="${shop.google_map_link}" 
+                width="100%" 
+                height="200" 
+                style="border:0;" 
+                loading="lazy" 
+                referrerpolicy="no-referrer-when-downgrade">
+              </iframe>
+            `
+          }}
+          javaScriptEnabled={true}
+          domStorageEnabled={true}
+          scalesPageToFit={false}
+        /> */}
+      </View>
+
+      <View style={styles.detailsContainer}>
+        <Text style={styles.address}>{shop.address}</Text>
+        <View style={styles.ratesContainer}>
+          <Text style={styles.rateText}>Making Charges: {shop.makingCharges}%</Text>
+          <Text style={styles.rateText}>Gold Rate: ₹{shop.goldRate}/g</Text>
+        </View>
+      </View>
+
+      <View style={styles.separator} />
+      <View style={styles.addReviewContainer}>
+        <StarRating />
+        <View style={styles.inputButtonContainer}>
+          <TextInput
+            style={styles.reviewInput}
+            placeholder="Write your review..."
+            value={newReview}
+            onChangeText={setNewReview}
+            multiline
+          />
+          <TouchableOpacity
+            style={styles.submitButton}
+            onPress={handleSubmitReview}
           >
-            <Marker
-              coordinate={{
-                latitude: shop.latitude,
-                longitude: shop.longitude,
-              }}
-              title={shop.name}
-            />
-          </MapView>
+            <Text style={styles.submitButtonText}>Submit</Text>
+          </TouchableOpacity>
         </View>
+        <Text style={[styles.warningText, !submitReviewWarning && styles.hiddenWarning]}>
+          {submitReviewWarning}
+        </Text>
+      </View>
 
-        <View style={styles.detailsContainer}>
-          <Text style={styles.address}>{shop.address}</Text>
-          <View style={styles.ratesContainer}>
-            <Text style={styles.rateText}>Making Charges: {shop.makingCharges}%</Text>
-            <Text style={styles.rateText}>Gold Rate: ₹{shop.goldRate}/g</Text>
+      <View style={styles.separator} />
+      <View style={styles.reviewsContainer}>
+        <Text style={styles.sectionTitle}>Reviews</Text>
+        {reviews.map((review) => (
+          <View key={review.id} style={styles.reviewItem}>
+            <Text style={styles.reviewUser}>{review.userName}</Text>
+            <Text style={styles.reviewRating}>Rating: {review.rating}/5</Text>
+            <Text style={styles.reviewComment}>{review.comment}</Text>
           </View>
-        </View>
-
-        <View style={styles.separator} />
-        <View style={styles.addReviewContainer}>
-          <StarRating />
-          <View style={styles.inputButtonContainer}>
-            <TextInput
-              style={styles.reviewInput}
-              placeholder="Write your review..."
-              value={newReview}
-              onChangeText={setNewReview}
-              multiline
-            />
-            <TouchableOpacity
-              style={styles.submitButton}
-              onPress={handleSubmitReview}
-            >
-              <Text style={styles.submitButtonText}>Submit</Text>
-            </TouchableOpacity>
-          </View>
-          <Text style={[styles.warningText, !submitReviewWarning && styles.hiddenWarning]}>
-            {submitReviewWarning}
-          </Text>
-        </View>
-
-        <View style={styles.separator} />
-        <View style={styles.reviewsContainer}>
-          <Text style={styles.sectionTitle}>Reviews</Text>
-          {reviews.map((review) => (
-            <View key={review.id} style={styles.reviewItem}>
-              <Text style={styles.reviewUser}>{review.userName}</Text>
-              <Text style={styles.reviewRating}>Rating: {review.rating}/5</Text>
-              <Text style={styles.reviewComment}>{review.comment}</Text>
-            </View>
-          ))}
-        </View>
-      </ScrollView>
-    </View>
+        ))}
+      </View>
+    </ScrollView>
   );
 }
 

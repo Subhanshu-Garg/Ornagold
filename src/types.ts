@@ -7,6 +7,8 @@ export interface Shop {
   latitude: number;
   longitude: number;
   address: string;
+  logo_img: string;
+  google_map_link: string;
   gallery: string[];
   reviews: Review[];
 }
