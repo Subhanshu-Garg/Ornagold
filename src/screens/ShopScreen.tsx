@@ -14,6 +14,7 @@ import { RouteProp } from '@react-navigation/native';
 import MapView, { Marker } from 'react-native-maps';
 import { RootStackParamList } from '../types';
 import { useAuth } from '../contexts/AuthContext';
+import { Icon } from 'react-native-elements'
 
 
 type ShopScreenProps = {
@@ -56,21 +57,6 @@ export default function ShopScreen({ route }: ShopScreenProps) {
     setNewReview('');
   };
 
-  const handleCall = async () => {
-    try {
-      const phoneNumber = `tel:${shop.phone}`;
-      const supported = await Linking.canOpenURL(phoneNumber);
-      console.log('phoneNumber', phoneNumber)
-      if (supported) {
-        await Linking.openURL(phoneNumber);
-      } else {
-        console.info('Phone calls are not supported on this device');
-      }
-    } catch (error) {
-      console.error('Error making call:', error);
-    }
-  };
-
   const StarRating = () => {
     return (
       <View style={styles.ratingTitleContainer}>
@@ -92,6 +78,27 @@ export default function ShopScreen({ route }: ShopScreenProps) {
         </View>
       </View>
     );
+  };
+
+  const handleCallPress = (phoneNumber: string) => {
+    Linking.openURL(`tel:${phoneNumber}`);
+  };
+
+
+
+  const handleCall = async () => {
+    try {
+      const phoneNumber = `tel:${shop.phone}`;
+      const supported = await Linking.canOpenURL(phoneNumber);
+      console.log('phoneNumber', phoneNumber)
+      if (supported) {
+        await Linking.openURL(phoneNumber);
+      } else {
+        console.info('Phone calls are not supported on this device');
+      }
+    } catch (error) {
+      console.error('Error making call:', error);
+    }
   };
 
   return (
@@ -120,9 +127,17 @@ export default function ShopScreen({ route }: ShopScreenProps) {
 
         <View style={styles.detailsContainer}>
           <Text style={styles.address}>{shop.address}</Text>
-          <View style={styles.ratesContainer}>
-            <Text style={styles.rateText}>Making Charges: {shop.makingCharges}%</Text>
-            <Text style={styles.rateText}>Gold Rate: ₹{shop.goldRate}/g</Text>
+          <View style={styles.addressAndCallContainer}>
+            <View style={styles.ratesContainer}>
+              <Text style={styles.rateText}>Making Charges: {shop.makingCharges}%</Text>
+              <Text style={styles.rateText}>Gold Rate: ₹{shop.goldRate}/g</Text>
+            </View>
+            <TouchableOpacity
+              style={styles.callButton}
+              onPress={() => handleCallPress(shop.phone)}
+            >
+              <Icon name="call" size={24} color="#fff" />
+            </TouchableOpacity>
           </View>
         </View>
 
@@ -161,10 +176,10 @@ export default function ShopScreen({ route }: ShopScreenProps) {
           ))}
         </View>
       </ScrollView>
-      
+
       <View style={styles.fixedButtonContainer}>
-        <Button 
-          title="Call Shop" 
+        <Button
+          title="Call Shop"
           onPress={() => requireAuth(handleCall)}
           color="#007AFF"
         />
@@ -188,13 +203,23 @@ const styles = StyleSheet.create({
   detailsContainer: {
     padding: 15,
   },
+  addressAndCallContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between'
+  },
+  callButton: {
+    backgroundColor: '#007AFF',
+    alignItems: 'center',
+    justifyContent: 'center',
+    height: 50,
+    width: 50,
+    borderRadius: 8
+  },
   address: {
     fontSize: 16,
     marginBottom: 10,
   },
   ratesContainer: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
     marginBottom: 15,
   },
   rateText: {

@@ -134,3 +134,7 @@ docs/pages/versions/*/react-native/*.diff
 
 expo-env.d.ts
 # @end expo-cli
+
+
+# Need to check should it be in gitignore or not
+ios

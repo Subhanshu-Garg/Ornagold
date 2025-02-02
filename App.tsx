@@ -24,7 +24,14 @@ function Navigation() {
         <Stack.Screen 
           name="Home" 
           component={HomeScreen}
-          options={{ title: 'Gold Shops' }}
+          options={{ 
+            title: 'OrnaGold',
+            headerTitleAlign: 'left',
+            headerStyle: {
+              backgroundColor: '#ffffff',
+            },
+            headerShadowVisible: false,
+          }}
         />
         <Stack.Screen 
           name="Shop" 
