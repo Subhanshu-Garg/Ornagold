@@ -138,3 +138,4 @@ expo-env.d.ts
 
 # Need to check should it be in gitignore or not
 ios
+android

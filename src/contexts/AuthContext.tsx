@@ -23,7 +23,6 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       } finally {
         setLoading(false);
         setAppReady(true);
-        await SplashScreen.hideAsync();
       }
     }
 
