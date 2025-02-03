@@ -4,7 +4,6 @@ import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { RootStackParamList, Shop } from '../types';
 import SearchBar from '../components/SearchBar';
 import ShopList from '../components/ShopList';
-import { mockShops } from '../data/mockData';
 import { Icon } from 'react-native-elements';
 import { useAuth } from '../contexts/AuthContext';
 import LoadingSpinner from '../components/LoadingSpinner';

@@ -12,9 +12,9 @@ import { RouteProp } from "@react-navigation/native";
 import { RootStackParamList } from "../types";
 import { useAuth } from "../contexts/AuthContext";
 import LoadingSpinner from "../components/LoadingSpinner";
-import { NativeStackNavigationProp } from "@react-navigation/native-stack/lib/typescript/src/types";
 import SignIn from "../components/SignIn";
 import SignUp from "../components/SignUp";
+import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 
 type AuthScreenProps = {
   route: RouteProp<RootStackParamList, "Auth">;

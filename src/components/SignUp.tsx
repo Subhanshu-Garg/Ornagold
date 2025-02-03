@@ -10,8 +10,8 @@ import {
 import { RootStackParamList } from "../types";
 import { useAuth } from "../contexts/AuthContext";
 import LoadingSpinner from "../components/LoadingSpinner";
-import { NativeStackNavigationProp } from "@react-navigation/native-stack/lib/typescript/src/types";
 import { RouteProp } from '@react-navigation/native';
+import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 
 type SignUpProps = {
   navigation: NativeStackNavigationProp<RootStackParamList, "Auth">;

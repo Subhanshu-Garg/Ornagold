@@ -1,28 +1,30 @@
 import React, { createContext, useContext, useEffect, useState, useMemo } from 'react';
 import { AuthError, Session, User } from '@supabase/supabase-js';
 import { supabase } from '../lib/supabase';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import { AuthContextType, SignInParams, SignUpParams } from '../types';
-import * as SplashScreen from 'expo-splash-screen';
 
 const AuthContext = createContext<AuthContextType>({} as AuthContextType);
 
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
-  const [appReady, setAppReady] = useState(false);
   const [authError, setAuthError] = useState<AuthError | null>(null);
 
   useEffect(() => {
     async function initializeAuth() {
       try {
-        const { data: { session }, error } = await supabase.auth.getSession();
+        const { data: { session } } = await supabase.auth.getSession();
         setUser(session?.user ?? null);
+
+        const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+          setUser(session?.user ?? null);
+        });
+  
+        return () => subscription?.unsubscribe();
       } catch (error) {
         console.error('Auth initialization error:', error);
       } finally {
         setLoading(false);
-        setAppReady(true);
       }
     }
 
@@ -62,7 +64,9 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
           if (error) throw error;
         }
       }
+      console.info('User is successfully authenticated.')
     } catch (error) {
+      console.error('Error while authentication.')
       setAuthError(error as AuthError);
       throw error;
     } finally {
@@ -133,10 +137,6 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     signOut,
     authError
   }), [user, loading, authError]);
-
-  if (!appReady) {
-    return null;
-  }
 
   return (
     <AuthContext.Provider value={value}>
