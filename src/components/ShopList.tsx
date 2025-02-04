@@ -1,6 +1,8 @@
 import React from 'react';
 import { StyleSheet, View, FlatList, TouchableOpacity, Text, Image, ActivityIndicator } from 'react-native';
 import { Shop } from '../types';
+import { useTheme } from '../contexts/ThemeContext';
+import { Theme } from '../constants/Theme';
 
 interface ShopListProps {
   shops: Shop[];
@@ -15,6 +17,9 @@ export default function ShopList({
   onEndReached,
   hasMore 
 }: ShopListProps) {
+  const { theme } = useTheme();
+  const styles = makeStyles(theme.colors);
+
   const renderShopItem = ({ item }: { item: Shop }) => (
     <TouchableOpacity
       style={styles.shopItem}
@@ -29,8 +34,8 @@ export default function ShopList({
         <Text style={styles.shopName}>{item.name}</Text>
         {/* <Text style={styles.shopLocality}>{item.locality}</Text> */}
         <View style={styles.ratesContainer}>
-          <Text>Making Charges: {item.makingCharges}%</Text>
-          <Text>Gold Rate: ₹{item.goldRate}/g</Text>
+          <Text style={styles.rateText}>Making Charges: {item.makingCharges}%</Text>
+          <Text style={styles.rateText}>Gold Rate: ₹{item.goldRate}/g</Text>
         </View>
       </View>
     </TouchableOpacity>
@@ -51,17 +56,18 @@ export default function ShopList({
   );
 }
 
-const styles = StyleSheet.create({
+const makeStyles = (colors: Theme['colors']) => StyleSheet.create({
   listContainer: {
     padding: 10,
   },
   shopItem: {
-    backgroundColor: 'white',
+    backgroundColor: colors.secondaryBackground,
+    borderColor: colors.primary,
     padding: 15,
     borderRadius: 8,
     marginBottom: 10,
     elevation: 2,
-    shadowColor: '#000',
+    shadowColor: colors.black,
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
     shadowRadius: 4,
@@ -72,21 +78,28 @@ const styles = StyleSheet.create({
     height: 70,
     borderRadius: 8,
     marginRight: 15,
+    backgroundColor: colors.secondary
   },
   textContainer: {
     flex: 1,
   },
   shopName: {
+    color: colors.textPrimary,
     fontSize: 18,
     fontWeight: 'bold',
   },
   shopLocality: {
-    color: '#666',
+    color: colors.textSecondary,
+    opacity: 0.8,
     marginTop: 4,
   },
   ratesContainer: {
     marginTop: 8,
     flexDirection: 'column',
     justifyContent: 'space-between',
+  },
+  rateText: {
+    color: colors.textSecondary,
+    fontSize: 14,
   },
 });

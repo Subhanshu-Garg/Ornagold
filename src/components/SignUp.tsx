@@ -12,6 +12,8 @@ import { useAuth } from "../contexts/AuthContext";
 import LoadingSpinner from "../components/LoadingSpinner";
 import { RouteProp } from '@react-navigation/native';
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
+import { useTheme } from "../contexts/ThemeContext";
+import { Theme } from "../constants/Theme";
 
 type SignUpProps = {
   navigation: NativeStackNavigationProp<RootStackParamList, "Auth">;
@@ -30,6 +32,9 @@ export default function SignUp({ navigation, route }: SignUpProps) {
   const [form, setForm] = useState<"email" | "phone">("email");
 
   const { signUp, loading } = useAuth();
+  const { theme } = useTheme()
+
+  const styles = makeStyles(theme.colors)
 
   const validatePhone = (phone: string) => {
     const regex = /^[+]?[(]?[0-9]{3}[)]?[-\s.]?[0-9]{3}[-\s.]?[0-9]{4,6}$/im;
@@ -47,13 +52,7 @@ export default function SignUp({ navigation, route }: SignUpProps) {
         displayName
       });
 
-      
-      const redirect = route?.params?.redirect
-      if (redirect) {
-        navigation.navigate(redirect.screen, redirect.params);
-      } else {
-        navigation.navigate('Home');
-      }
+      navigation.goBack()
     } catch (error) {
       setError(error instanceof Error ? error.message : "Sign up failed");
     }
@@ -68,6 +67,7 @@ export default function SignUp({ navigation, route }: SignUpProps) {
       <TextInput
         style={styles.input}
         placeholder="Your name"
+        placeholderTextColor={theme.colors.textSecondary}
         value={displayName}
         onChangeText={setDisplayName}
         autoCapitalize="none"
@@ -77,6 +77,7 @@ export default function SignUp({ navigation, route }: SignUpProps) {
         <TextInput
           style={styles.input}
           placeholder="Mobile Number"
+          placeholderTextColor={theme.colors.textSecondary}
           value={phone}
           onChangeText={setPhone}
           keyboardType="phone-pad"
@@ -92,6 +93,7 @@ export default function SignUp({ navigation, route }: SignUpProps) {
         <TextInput
           style={styles.input}
           placeholder="Enter OTP"
+          placeholderTextColor={theme.colors.textSecondary}
           value={otp}
           onChangeText={setOtp}
           keyboardType="number-pad"
@@ -103,6 +105,7 @@ export default function SignUp({ navigation, route }: SignUpProps) {
           <TextInput
             style={styles.input}
             placeholder="Email"
+            placeholderTextColor={theme.colors.textSecondary}
             value={email}
             onChangeText={setEmail}
             autoCapitalize="none"
@@ -111,6 +114,7 @@ export default function SignUp({ navigation, route }: SignUpProps) {
           <TextInput
             style={styles.input}
             placeholder="Password"
+            placeholderTextColor={theme.colors.textSecondary}
             value={password}
             onChangeText={setPassword}
             secureTextEntry
@@ -153,33 +157,28 @@ export default function SignUp({ navigation, route }: SignUpProps) {
   );
 }
 
-const styles = StyleSheet.create({
-  title: {
-    fontSize: 24,
-    fontWeight: "bold",
-    marginBottom: 20,
-    textAlign: "center",
-  },
+const makeStyles = (colours: Theme['colors']) => StyleSheet.create({
   input: {
     borderWidth: 1,
-    borderColor: "#ddd",
+    borderColor: colours.primary,
     padding: 10,
     borderRadius: 8,
     marginBottom: 10,
+    color: colours.textPrimary
   },
   button: {
-    backgroundColor: "#007AFF",
+    backgroundColor: colours.primary,
     padding: 15,
     borderRadius: 8,
     alignItems: "center",
     marginTop: 10,
   },
   buttonText: {
-    color: "white",
+    color: colours.secondaryBackground,
     fontWeight: "bold",
   },
   switchText: {
-    color: "#007AFF",
+    color: colours.primary,
     textAlign: "center",
     marginTop: 20,
   },
@@ -188,16 +187,5 @@ const styles = StyleSheet.create({
     alignItems: "center",
     justifyContent: "space-between",
     marginBottom: 10,
-  },
-  socialButton: {
-    backgroundColor: "#e3e3e3",
-    padding: 15,
-    borderRadius: 8,
-    alignItems: "center",
-    marginVertical: 5,
-  },
-  socialButtonText: {
-    color: "#333",
-    fontWeight: "bold",
-  },
+  }
 });

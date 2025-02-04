@@ -9,6 +9,8 @@ import { useAuth } from '../contexts/AuthContext';
 import LoadingSpinner from '../components/LoadingSpinner';
 import { getShops } from '../services/shops';
 import { errorHandler } from '../utils/errorHandler';
+import { useTheme } from '../contexts/ThemeContext';
+import { Theme } from '../constants/Theme';
 
 type HomeScreenProps = {
   navigation: NativeStackNavigationProp<RootStackParamList, 'Home'>;
@@ -22,6 +24,10 @@ export default function HomeScreen({ navigation }: HomeScreenProps) {
   const [isProcessing, setIsProcessing] = useState(false);
   const [shops, setShops] = useState<Shop[]>([]);
   const [error, setError] = useState<Error | null>(null);
+  const { theme } = useTheme();
+
+
+const styles = makeStyles(theme.colors)
 
   useLayoutEffect(() => {
     const iconName = user ? 'logout' : 'login'
@@ -38,7 +44,7 @@ export default function HomeScreen({ navigation }: HomeScreenProps) {
             name={iconName} 
             type="material" 
             size={28} 
-            color={isProcessing ? '#999' : '#007AFF'}
+            color={isProcessing ? theme.colors.secondaryBackground : theme.colors.background}
             style={styles.headerIcon}
           />
           <Text style={[styles.headerButtonText, isProcessing && styles.disabledText]}>
@@ -47,7 +53,7 @@ export default function HomeScreen({ navigation }: HomeScreenProps) {
         </TouchableOpacity>
       ),
     });
-  }, [navigation, user, isProcessing]);
+  }, [navigation, user, isProcessing, theme]);
 
   const loadShops = async (currentPage: number, query: string) => {
     try {
@@ -95,12 +101,7 @@ export default function HomeScreen({ navigation }: HomeScreenProps) {
       if(user) {
         await signOut();
       } else {
-        navigation.navigate('Auth', { 
-          redirect: {
-            screen: 'Home',
-            params: undefined
-          }
-        });
+        navigation.navigate('Auth');
       }
     } catch (error) {
       console.error('Auth error:', error);
@@ -129,10 +130,10 @@ export default function HomeScreen({ navigation }: HomeScreenProps) {
   );
 }
 
-const styles = StyleSheet.create({
+const makeStyles = (colors: Theme['colors']) => StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#f5f5f5',
+    backgroundColor: colors.background,
   },
   headerButton: {
     flexDirection: 'row',
@@ -146,15 +147,15 @@ const styles = StyleSheet.create({
     marginRight: 4,
   },
   headerButtonText: {
-    color: '#007AFF',
+    color: colors.background,
     fontSize: 14,
     fontWeight: '500',
     marginLeft: 4,
   },
   disabledButton: {
-    backgroundColor: '#f8f8f8',
+    backgroundColor: colors.secondaryBackground,
   },
   disabledText: {
-    color: '#999',
-  },
+    color: colors.background,
+  }
 });

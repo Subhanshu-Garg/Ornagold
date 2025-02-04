@@ -1,5 +1,5 @@
 import React from 'react';
-import { NavigationContainer } from '@react-navigation/native';
+import { NavigationContainer, DefaultTheme } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import HomeScreen from './src/screens/HomeScreen';
 import ShopScreen from './src/screens/ShopScreen';
@@ -8,6 +8,8 @@ import AuthScreen from './src/screens/AuthScreen';
 import { AuthProvider } from './src/contexts/AuthContext';
 import { ErrorBoundary } from './src/components/ErrorBoundary';
 import * as SplashScreen from 'expo-splash-screen';
+import { useTheme } from './src/contexts/ThemeContext';
+import { ThemeProvider } from './src/contexts/ThemeContext';
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
 
@@ -15,8 +17,20 @@ const Stack = createNativeStackNavigator<RootStackParamList>();
 SplashScreen.preventAutoHideAsync();
 
 function Navigation() {
+  const { theme } = useTheme();
+
   return (
-    <NavigationContainer onReady={() => SplashScreen.hideAsync()}>
+    <NavigationContainer
+      theme={{
+        ...DefaultTheme,
+        dark: theme.mode === 'dark',
+        colors: {
+          ...DefaultTheme.colors,
+          ...theme.colors,
+        },
+      }}
+      onReady={() => SplashScreen.hideAsync()}
+    >
       <Stack.Navigator>
         <Stack.Screen 
           name="Home" 
@@ -25,15 +39,23 @@ function Navigation() {
             title: 'OrnaGold',
             headerTitleAlign: 'left',
             headerStyle: {
-              backgroundColor: '#ffffff',
+              backgroundColor: theme.colors.primary,
             },
+            headerTintColor: theme.colors.background,
             headerShadowVisible: false,
           }}
         />
         <Stack.Screen 
           name="Shop" 
           component={ShopScreen}
-          options={({ route }) => ({ title: route.params.shop.name })}
+          options={
+            ({ route }) => ({ title: route.params.shop.name, headerStyle: {
+              backgroundColor: theme.colors.primary
+            },
+            headerTintColor: theme.colors.background
+           })
+
+          }
         />
         <Stack.Screen
           name="Auth"
@@ -45,12 +67,16 @@ function Navigation() {
   );
 }
 
-export default function App() {
+function AppWrapper() {
   return (
-    <ErrorBoundary>
+    <ThemeProvider>
       <AuthProvider>
-        <Navigation />
+        <ErrorBoundary>
+          <Navigation />
+        </ErrorBoundary>
       </AuthProvider>
-    </ErrorBoundary>
+    </ThemeProvider>
   );
 }
+
+export default AppWrapper;

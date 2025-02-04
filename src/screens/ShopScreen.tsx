@@ -14,7 +14,7 @@ import { RouteProp } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import MapView, { Marker } from 'react-native-maps';
 import { Review, RootStackParamList } from '../types';
-import { Icon } from 'react-native-elements';
+import { colors, Icon } from 'react-native-elements';
 import useProtectedAction from '../hooks/useProtectedAction';
 import { getShopReviews, submitShopReview } from '../services/reviews';
 import { errorHandler } from '../utils/errorHandler';
@@ -22,6 +22,8 @@ import { User } from '@supabase/supabase-js';
 import { useAuth } from '../contexts/AuthContext';
 import useAsync from '../hooks/useAsync';
 import LoadingSpinner from '../components/LoadingSpinner';
+import { useTheme } from '../contexts/ThemeContext';
+import { Theme } from '../constants/Theme';
 
 type ShopScreenProps = {
   route: RouteProp<RootStackParamList, 'Shop'>;
@@ -36,6 +38,9 @@ export default function ShopScreen({ route, navigation }: ShopScreenProps) {
   const [submitReviewWarning, setSubmitReviewWarning] = useState('');
   const { user } = useAuth();
   const protectedAction = useProtectedAction();
+  const { theme } = useTheme();
+
+  const styles = makeStyles(theme.colors)
 
   // Using the custom hook for reviews
   const {
@@ -139,6 +144,7 @@ export default function ShopScreen({ route, navigation }: ShopScreenProps) {
             latitudeDelta: 0.01,
             longitudeDelta: 0.01,
           }}
+          userInterfaceStyle={theme.mode}
         >
           <Marker
             coordinate={{
@@ -161,7 +167,7 @@ export default function ShopScreen({ route, navigation }: ShopScreenProps) {
             style={styles.callButton}
             onPress={() => protectedAction(() => handleCallPress(shop.phone))}
           >
-            <Icon name="call" size={24} color="#fff" />
+            <Icon name="call" size={24} color={theme.colors.background} />
           </TouchableOpacity>
         </View>
       </View>
@@ -173,6 +179,7 @@ export default function ShopScreen({ route, navigation }: ShopScreenProps) {
           <TextInput
             style={styles.reviewInput}
             placeholder="Write your review..."
+            placeholderTextColor={theme.colors.textSecondary}
             value={newReview}
             onChangeText={setNewReview}
             multiline
@@ -204,10 +211,10 @@ export default function ShopScreen({ route, navigation }: ShopScreenProps) {
   );
 }
 
-const styles = StyleSheet.create({
+const makeStyles = (colors: Theme['colors']) => StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff',
+    backgroundColor: colors.background,
   },
   mapContainer: {
     height: 200,
@@ -224,7 +231,7 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between'
   },
   callButton: {
-    backgroundColor: '#007AFF',
+    backgroundColor: colors.primary,
     alignItems: 'center',
     justifyContent: 'center',
     height: 50,
@@ -232,6 +239,7 @@ const styles = StyleSheet.create({
     borderRadius: 8
   },
   address: {
+    color: colors.textPrimary,
     fontSize: 16,
     marginBottom: 10,
   },
@@ -241,6 +249,7 @@ const styles = StyleSheet.create({
   rateText: {
     fontSize: 16,
     fontWeight: '500',
+    color: colors.textSecondary
   },
   reviewsContainer: {
     padding: 15,
@@ -249,23 +258,28 @@ const styles = StyleSheet.create({
     fontSize: 20,
     fontWeight: 'bold',
     marginBottom: 15,
+    color: colors.textPrimary
   },
   reviewItem: {
     marginBottom: 15,
     padding: 10,
-    backgroundColor: '#f5f5f5',
+    backgroundColor: colors.secondaryBackground,
+    borderColor: colors.primary,
+    borderWidth: 1,
     borderRadius: 8,
   },
   reviewUser: {
     fontWeight: 'bold',
     marginBottom: 5,
+    color: colors.textPrimary
   },
   reviewRating: {
-    color: '#666',
+    color: colors.textSecondary,
     marginBottom: 5,
   },
   reviewComment: {
     fontSize: 14,
+    color: colors.textPrimary
   },
   addReviewContainer: {
     padding: 15,
@@ -279,20 +293,21 @@ const styles = StyleSheet.create({
   reviewInput: {
     flex: 1,
     borderWidth: 1,
-    borderColor: '#ddd',
+    borderColor: colors.primary,
     borderRadius: 8,
     padding: 10,
     minHeight: 50,
+    color: colors.textPrimary
   },
   submitButton: {
-    backgroundColor: '#007AFF',
+    backgroundColor: colors.primary,
     padding: 15,
     borderRadius: 8,
     alignItems: 'center',
     justifyContent: 'center',
   },
   submitButtonText: {
-    color: 'white',
+    color: colors.background,
     fontWeight: 'bold',
   },
   ratingTitleContainer: {
@@ -308,7 +323,7 @@ const styles = StyleSheet.create({
   ratingTitle: {
     fontSize: 16,
     fontWeight: '600',
-    color: '#333',
+    color: colors.textPrimary,
   },
   starContainer: {
     flexDirection: 'row',
@@ -322,7 +337,7 @@ const styles = StyleSheet.create({
   },
   separator: {
     height: 1,
-    backgroundColor: '#ddd',
+    backgroundColor: colors.primary,
     marginBottom: 15,
   },
   warningText: {

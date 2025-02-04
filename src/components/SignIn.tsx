@@ -4,20 +4,22 @@ import {
   View,
   TextInput,
   TouchableOpacity,
-  Text
+  Text,
 } from "react-native";
 import { RootStackParamList } from "../types";
 import { useAuth } from "../contexts/AuthContext";
 import LoadingSpinner from "../components/LoadingSpinner";
-import { RouteProp } from '@react-navigation/native';
+import { RouteProp } from "@react-navigation/native";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
+import { useTheme } from "../contexts/ThemeContext";
+import { Theme } from "../constants/Theme";
 
 type SignInProps = {
   navigation: NativeStackNavigationProp<RootStackParamList, "Auth">;
   route?: RouteProp<RootStackParamList, "Auth">;
 };
 
-export default function SignIn({ navigation, route }: SignInProps) {
+export default function SignIn({ navigation }: SignInProps) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
@@ -27,13 +29,16 @@ export default function SignIn({ navigation, route }: SignInProps) {
   const [form, setForm] = useState("email");
 
   const { signIn, signUp, loading } = useAuth();
+  const { theme } = useTheme();
+
+  const styles = makeStyles(theme.colors);
 
   const validatePhone = (phone: string) => {
     const regex = /^[+]?[(]?[0-9]{3}[)]?[-\s.]?[0-9]{3}[-\s.]?[0-9]{4,6}$/im;
     return regex.test(phone);
   };
 
-  const handleSignIn = async (method: 'email' | 'google' | 'otp') => {
+  const handleSignIn = async (method: "email" | "google" | "otp") => {
     await signIn({
       method,
       phone,
@@ -41,13 +46,8 @@ export default function SignIn({ navigation, route }: SignInProps) {
       email,
       password,
     });
-    
-    const redirect = route?.params?.redirect;
-    if (redirect) {
-      navigation.navigate(redirect.screen, redirect.params);
-    } else {
-      navigation.navigate('Home');
-    }
+
+    navigation.goBack()
   };
 
   if (loading) {
@@ -88,6 +88,7 @@ export default function SignIn({ navigation, route }: SignInProps) {
           <TextInput
             style={styles.input}
             placeholder="Email"
+            placeholderTextColor={theme.colors.textSecondary}
             value={email}
             onChangeText={setEmail}
             autoCapitalize="none"
@@ -96,6 +97,7 @@ export default function SignIn({ navigation, route }: SignInProps) {
           <TextInput
             style={styles.input}
             placeholder="Password"
+            placeholderTextColor={theme.colors.textSecondary}
             value={password}
             onChangeText={setPassword}
             secureTextEntry
@@ -108,9 +110,7 @@ export default function SignIn({ navigation, route }: SignInProps) {
           style={styles.button}
           onPress={async () => await handleSignIn("email")}
         >
-          <Text style={styles.buttonText}>
-            Sign In
-          </Text>
+          <Text style={styles.buttonText}>Sign In</Text>
         </TouchableOpacity>
       ) : (
         <TouchableOpacity
@@ -151,51 +151,32 @@ export default function SignIn({ navigation, route }: SignInProps) {
   );
 }
 
-const styles = StyleSheet.create({
-  title: {
-    fontSize: 24,
-    fontWeight: "bold",
-    marginBottom: 20,
-    textAlign: "center",
-  },
-  input: {
-    borderWidth: 1,
-    borderColor: "#ddd",
-    padding: 10,
-    borderRadius: 8,
-    marginBottom: 10,
-  },
-  button: {
-    backgroundColor: "#007AFF",
-    padding: 15,
-    borderRadius: 8,
-    alignItems: "center",
-    marginTop: 10,
-  },
-  buttonText: {
-    color: "white",
-    fontWeight: "bold",
-  },
-  switchText: {
-    color: "#007AFF",
-    textAlign: "center",
-    marginTop: 20,
-  },
-  switchContainer: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-    marginBottom: 10,
-  },
-  socialButton: {
-    backgroundColor: "#e3e3e3",
-    padding: 15,
-    borderRadius: 8,
-    alignItems: "center",
-    marginVertical: 5,
-  },
-  socialButtonText: {
-    color: "#333",
-    fontWeight: "bold",
-  },
-});
+const makeStyles = (colors: Theme["colors"]) => StyleSheet.create({
+    input: {
+      borderWidth: 1,
+      borderColor: colors.primary,
+      padding: 10,
+      borderRadius: 8,
+      marginBottom: 10,
+      color: colors.textPrimary
+    },
+    button: {
+      backgroundColor: colors.primary,
+      padding: 15,
+      borderRadius: 8,
+      alignItems: "center",
+      marginTop: 10,
+    },
+    buttonText: {
+      color: colors.secondaryBackground,
+      fontWeight: "bold",
+    },
+    switchText: {
+      color: colors.textPrimary,
+      textAlign: "center",
+      marginTop: 20,
+    },
+    socialButton: {
+      backgroundColor: colors.secondaryBackground,
+    },
+  });

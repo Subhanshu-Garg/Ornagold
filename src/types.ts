@@ -49,10 +49,5 @@ export interface AuthContextType {
 export type RootStackParamList = {
   Home: undefined;
   Shop: { shop: Shop };
-  Auth: { 
-    redirect?: {
-      screen: keyof RootStackParamList;
-      params: any
-    }
-  };
+  Auth: undefined
 };
