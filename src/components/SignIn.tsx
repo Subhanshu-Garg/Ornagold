@@ -39,15 +39,19 @@ export default function SignIn({ navigation }: SignInProps) {
   };
 
   const handleSignIn = async (method: "email" | "google" | "otp") => {
-    await signIn({
-      method,
-      phone,
-      code: otp,
-      email,
-      password,
-    });
+    try {
+      await signIn({
+        method,
+        phone,
+        code: otp,
+        email,
+        password,
+      });
 
-    navigation.goBack()
+      navigation.goBack()
+    } catch (error) {
+      setError(error instanceof Error ? error.message : "Sign up failed");
+    }
   };
 
   if (loading) {
