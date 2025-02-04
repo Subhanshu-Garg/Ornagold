@@ -117,6 +117,7 @@ export default function ShopScreen({ route, navigation }: ShopScreenProps) {
   const handleCallPress = async (phoneNum: string) => {
     try {
       const phoneNumber = `tel:${phoneNum}`;
+      console.log(phoneNumber)
       const supported = await Linking.canOpenURL(phoneNumber);
       if (supported) {
         await Linking.openURL(phoneNumber);

@@ -66,7 +66,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       }
       console.info('User is successfully authenticated.')
     } catch (error) {
-      console.error('Error while authentication.')
+      console.error('Error while authentication.', error)
       setAuthError(error as AuthError);
       throw error;
     } finally {
@@ -108,6 +108,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         }
       }
     } catch (error) {
+      console.log('Error while signup', error)
       setAuthError(error as AuthError);
       throw error;
     } finally {
