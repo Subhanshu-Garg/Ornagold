@@ -1,4 +1,4 @@
-{
+export default {
   "expo": {
     "name": "Ornagold",
     "slug": "ornagold",
@@ -11,7 +11,9 @@
     "extra": {
       "eas": {
         "projectId": "5782fe14-d5ee-4ead-bd28-2181e17c5eb1"
-      }
+      },
+      "supabaseUrl": process.env.SUPABASE_URL,
+      "supabaseAnonKey": process.env.SUPABASE_ANON_KEY
     },
     "android": {
       "package": "com.ornagold.app",
@@ -89,4 +91,4 @@
       "url": "https://u.expo.dev/5782fe14-d5ee-4ead-bd28-2181e17c5eb1"
     }
   }
-}
+};
