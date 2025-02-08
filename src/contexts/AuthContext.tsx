@@ -50,16 +50,19 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         if (error) throw error;
       }
       else if (params.method === 'otp') {
+        console.info('Inside OTP')
         if (params.code) {
+          console.info('Verifying OTP')
           const { error } = await supabase.auth.verifyOtp({
-            phone: params.phone,
+            phone: `+91${params.phone}`,
             token: params.code,
             type: 'sms',
           });
           if (error) throw error;
         } else {
+          console.info('Generate OTP')
           const { error } = await supabase.auth.signInWithOtp({
-            phone: params.phone
+            phone: `+91${params.phone}`
           });
           if (error) throw error;
         }
@@ -96,14 +99,20 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
           const { error } = await supabase.auth.verifyOtp({
             phone: params.phone,
             token: params.code,
-            type: 'sms',
+            type: 'sms'
           });
           if (error) throw error;
         } else {
+          console.log('Inside sign up for phone')
           const { error } = await supabase.auth.signUp({
-            phone: params.phone,
-            password: ''
-          });
+            phone: `${+91}params.phone`,
+            password: params.password,
+            options: {
+              data: {
+                displayName: params.displayName
+              }
+            }
+          })
           if (error) throw error;
         }
       }

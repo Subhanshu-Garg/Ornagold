@@ -35,7 +35,7 @@ export type SignInParams =
 
 export type SignUpParams =
   | { method: 'email'; email: string; password: string; displayName: string }
-  | { method: 'phone'; phone: string; code?: string; displayName: string };
+  | { method: 'phone'; phone: string; code?: string; password: string; displayName: string };
 
 export interface AuthContextType {
   user: User | null;
