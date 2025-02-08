@@ -16,7 +16,7 @@ export default function SearchBar({ value, onChangeText }: SearchBarProps) {
     <View style={styles.container}>
       <TextInput
         style={styles.input}
-        placeholder="Search shops by name or locality..."
+        placeholder="Search for gold shops nearby..."
         placeholderTextColor={theme.colors.textPrimary}
         value={value}
         onChangeText={onChangeText}

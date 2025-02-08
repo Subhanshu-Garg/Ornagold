@@ -47,7 +47,15 @@ export interface AuthContextType {
 }
 
 export type RootStackParamList = {
-  Home: undefined;
+  MainTabs: undefined;
   Shop: { shop: Shop };
-  Auth: undefined
+  Auth: undefined;
+  Home: undefined;
+};
+
+export type TabStackParamList = {
+  Home: undefined;
+  Discover: undefined;
+  Favorites: undefined;
+  Profile: undefined;
 };

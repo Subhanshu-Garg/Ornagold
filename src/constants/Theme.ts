@@ -9,6 +9,7 @@ export type Theme = {
     secondaryBackground: string;
     textPrimary: string;
     textSecondary: string;
+    success: string
   };
   mode: 'light' | 'dark';
 };
@@ -24,6 +25,7 @@ export const lightTheme: Theme = {
 
     textPrimary: Colors.pureBlack, // Primary text color
     textSecondary: Colors.darkGray, // Secondary text color
+    success: Colors.successGreen
   },
 };
 
@@ -39,5 +41,6 @@ export const darkTheme: Theme = {
 
     textPrimary: Colors.pureWhite, // Primary text color
     textSecondary: Colors.starkWhite_4, // Secondary text color
+    success: Colors.successGreen
   },
 }; 

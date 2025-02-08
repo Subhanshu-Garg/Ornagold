@@ -13,7 +13,7 @@ import {
 import { RouteProp } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import MapView, { Marker } from 'react-native-maps';
-import { Review, RootStackParamList } from '../types';
+import { Review, RootStackParamList, Shop } from '../types';
 import { colors, Icon } from 'react-native-elements';
 import useProtectedAction from '../hooks/useProtectedAction';
 import { getShopReviews, submitShopReview } from '../services/reviews';
@@ -32,7 +32,7 @@ type ShopScreenProps = {
 
 export default function ShopScreen({ route, navigation }: ShopScreenProps) {
   const { shop: initialShop } = route.params;
-  const [shop, setShop] = useState(initialShop);
+  const [shop, setShop] = useState<Shop>(initialShop);
   const [newReview, setNewReview] = useState('');
   const [rating, setRating] = useState(0);
   const [submitReviewWarning, setSubmitReviewWarning] = useState('');
@@ -49,12 +49,7 @@ export default function ShopScreen({ route, navigation }: ShopScreenProps) {
     execute: fetchReviews
   } = useAsync<Review[]>(useCallback(async () => {
     return getShopReviews(shop.id);
-  }, [shop.id]));
-
-  // Initial fetch
-  useEffect(() => {
-    fetchReviews();
-  }, [fetchReviews]);
+  }, [shop]));
 
   const handleSubmitReview = async () => {
     Keyboard.dismiss();
@@ -128,6 +123,14 @@ export default function ShopScreen({ route, navigation }: ShopScreenProps) {
       console.error('Error making call:', error);
     }
   };
+
+  if (!shop) {
+    return (
+      <View style={styles.container}>
+        <Text>Shop not found</Text>
+      </View>
+    );
+  }
 
   if(isLoadingReviews) {
     return <LoadingSpinner />
@@ -351,4 +354,9 @@ const makeStyles = (colors: Theme['colors']) => StyleSheet.create({
     height: 0, // Make it disappear when empty
     opacity: 0, // Hide the text
   }
+});
+
+// Add navigation options
+ShopScreen.navigationOptions = ({ route }: ShopScreenProps) => ({
+  title: route.params.shop.name
 });
