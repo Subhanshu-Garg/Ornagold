@@ -84,7 +84,7 @@ const makeStyles = (colors: Theme['colors']) => StyleSheet.create({
     alignItems: 'center',
     paddingVertical: 30,
     borderBottomWidth: 1,
-    borderBottomColor: colors.border,
+    borderBottomColor: colors.primary,
     marginBottom: 20,
   },
   userEmail: {
@@ -117,7 +117,7 @@ const makeStyles = (colors: Theme['colors']) => StyleSheet.create({
     alignItems: 'center',
     paddingVertical: 15,
     borderBottomWidth: 1,
-    borderBottomColor: colors.border,
+    borderBottomColor: colors.primary,
   },
   menuIcon: {
     marginRight: 15,

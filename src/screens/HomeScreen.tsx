@@ -49,10 +49,8 @@ export default function HomeScreen({ navigation }: HomeScreenProps) {
   const [page, setPage] = useState(1);
   const [hasMore, setHasMore] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
-  const { user, loading, signOut } = useAuth()
-  const [isProcessing, setIsProcessing] = useState(false);
+  const {  loading } = useAuth()
   const [shops, setShops] = useState<Shop[]>([]);
-  const [error, setError] = useState<Error | null>(null);
   const { theme } = useTheme();
   const [location, setLocation] = useState<Location.LocationObject | null>(null);
   const [currentCity, setCurrentCity] = useState('');
@@ -94,19 +92,6 @@ export default function HomeScreen({ navigation }: HomeScreenProps) {
 
     return () => clearInterval(interval);
   }, [activeBanner]);
-
-  const calculateDistance = (shopLat: number, shopLon: number) => {
-    if (!location) return 'N/A';
-    const R = 6371; // Earth radius in km
-    const dLat = (shopLat - location.coords.latitude) * Math.PI / 180;
-    const dLon = (shopLon - location.coords.longitude) * Math.PI / 180;
-    const a = Math.sin(dLat/2) * Math.sin(dLat/2) +
-              Math.cos(location.coords.latitude * Math.PI / 180) * 
-              Math.cos(shopLat * Math.PI / 180) *
-              Math.sin(dLon/2) * Math.sin(dLon/2);
-    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
-    return `${Math.round(c * 100)/100} km`;
-  };
 
   const loadShops = async (currentPage: number, query: string) => {
     try {
@@ -172,6 +157,10 @@ export default function HomeScreen({ navigation }: HomeScreenProps) {
               title="Popular Shops Near You"
               shops={shops}
               onShopPress={handleShopPress}
+              onViewAll={() => navigation.navigate('ShopList', { 
+                filter: 'nearby',
+                title: 'All Nearby Shops'
+              })}
               location={location}
               showDistance={true}
             />

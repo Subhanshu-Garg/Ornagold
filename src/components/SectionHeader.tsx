@@ -3,12 +3,12 @@ import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 import { useTheme } from '../contexts/ThemeContext';
 import { Theme } from '../constants/Theme';
 
-type Props = {
+type SectionHeaderProps = {
   title: string;
   onViewAll?: () => void;
 };
 
-const SectionHeader = ({ title, onViewAll }: Props) => {
+const SectionHeader = ({ title, onViewAll }: SectionHeaderProps) => {
   const { theme } = useTheme();
   const styles = makeStyles(theme.colors);
 

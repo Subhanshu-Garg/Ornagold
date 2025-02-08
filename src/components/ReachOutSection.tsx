@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
+import { View, Text, TouchableOpacity, StyleSheet, Image } from 'react-native';
 import { useTheme } from '../contexts/ThemeContext';
 import { Theme } from '../constants/Theme';
 // import { Icon } from '@expo/vector-icons';
@@ -15,54 +15,77 @@ const ReachOutSection = () => {
   };
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>Need Help?</Text>
-      <TouchableOpacity 
-        style={styles.contactButton}
-        onPress={handleContactPress}
-        activeOpacity={0.8}
-      >
-        <Icon 
-          name="headset-mic" 
-          size={24} 
-          color={theme.colors.background} 
-          style={styles.icon}
-        />
-        <Text style={styles.buttonText}>24/7 Customer Support</Text>
-      </TouchableOpacity>
-    </View>
+    <TouchableOpacity style={styles.container} onPress={handleContactPress} activeOpacity={0.8}>
+      <Image
+        source={require('../../assets/images/contact-support.png')}
+        style={styles.backgroundImage}
+        resizeMode="contain"
+      />
+      <Text style={styles.title}>
+        Need Help With{'\n'}
+        <Text style={{ fontWeight: '800' }}>Finding Gold Deals?</Text>
+      </Text>
+      <View style={styles.contactButton}> 
+        <View>
+          <Text style={styles.buttonText}>24/7</Text>
+          <Text style={styles.buttonText}>Customer</Text>
+          <Text style={styles.buttonText}>Support</Text>
+        </View>
+      </View>
+    </TouchableOpacity>
   );
 };
 
 const makeStyles = (colors: Theme['colors']) => StyleSheet.create({
   container: {
-    padding: 20,
-    marginHorizontal: 15,
+    height: 180,
+    margin: 15,
     borderRadius: 12,
-    backgroundColor: colors.secondaryBackground,
-    marginVertical: 15,
+    overflow: 'hidden',
+    backgroundColor: colors.primary,
+  },
+  backgroundImage: {
+    position: 'absolute',
+    right: -40,
+    bottom: 0,
+    width: 300,
+    height: 150,
+    resizeMode: 'contain',
+  },
+  contentContainer: {
+    position: 'absolute',
+    top: 20,
+    left: 20,
+    zIndex: 2,
+    width: '60%',
   },
   title: {
     fontSize: 18,
     fontWeight: 'bold',
-    color: colors.textPrimary,
-    marginBottom: 15,
+    color: colors.background,
+    marginBottom: 25,
+    padding: 20,
+    lineHeight: 24,
   },
   contactButton: {
     flexDirection: 'row',
     alignItems: 'center',
     backgroundColor: colors.primary,
-    paddingVertical: 12,
-    paddingHorizontal: 20,
     borderRadius: 8,
+    width: '30%',
+    position: 'absolute',
+    bottom: 20,
+    left: 20,
+    justifyContent: 'flex-start',
   },
   icon: {
-    marginRight: 10,
+    marginRight: 8,
   },
   buttonText: {
     color: colors.background,
-    fontSize: 16,
-    fontWeight: '500',
+    fontSize: 14,
+    fontWeight: '600',
+    lineHeight: 18,
   },
 });
 

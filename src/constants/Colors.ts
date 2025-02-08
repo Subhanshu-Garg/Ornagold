@@ -11,5 +11,6 @@ export const Colors = {
   darkGray: '#2d2d2d',
   lightGray: '#f5f5f5',
   mediumGray: '#666666',
-  successGreen: '#4CAF50'
+  successGreen: '#4CAF50',
+  errorRed: '#ff2c2c'
 }; 

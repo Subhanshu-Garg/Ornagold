@@ -4,7 +4,7 @@ import { Shop } from '../types';
 import { useTheme } from '../contexts/ThemeContext';
 import { Theme } from '../constants/Theme';
 import { Icon } from 'react-native-elements';
-import { Location } from '../types';
+import * as Location from 'expo-location';
 
 interface ShopListProps {
   shops: Shop[];
@@ -88,6 +88,11 @@ export default function ShopList({
           </View>
         </View>
       </View>
+      {/* {item.specialOffer && (
+        <View style={styles.offerBadge}>
+          <Text style={styles.offerText}>{shop.specialOffer}</Text>
+        </View>
+      )} */}
     </TouchableOpacity>
   );
 
