@@ -59,3 +59,11 @@ export type TabStackParamList = {
   Favorites: undefined;
   Profile: undefined;
 };
+
+export type Banner = {
+  bannerTitle: string,
+  bannerText: string,
+  ctaText: string,
+  uri: string,
+  color: string
+}

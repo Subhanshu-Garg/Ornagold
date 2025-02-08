@@ -1,11 +1,25 @@
 import React, { useRef } from 'react';
-import { FlatList, View, Image, Dimensions, StyleSheet } from 'react-native';
+import { FlatList, View, Text, Image, Dimensions, StyleSheet, TouchableOpacity } from 'react-native';
 import { useTheme } from '../contexts/ThemeContext';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Theme } from '../constants/Theme';
+import Carousel from 'react-native-reanimated-carousel';
+import { Icon } from '@rneui/themed';
+import { Banner } from '../types';
+
+import {
+    configureReanimatedLogger,
+    ReanimatedLogLevel,
+  } from 'react-native-reanimated';
+  
+  // This is the default configuration
+  configureReanimatedLogger({
+    level: ReanimatedLogLevel.warn,
+    strict: false, // Reanimated runs in strict mode by default
+  });
 
 type Props = {
-  banners: Array<{ uri: string; color: string }>;
+  banners: Banner[];
   activeIndex: number;
   onBannerChange: (index: number) => void;
   headerColor: string;
@@ -16,50 +30,56 @@ const BannerCarousel = ({ banners, activeIndex, onBannerChange, headerColor }: P
   const flatListRef = useRef<FlatList>(null);
   const styles = makeStyles(theme.colors);
 
-  const renderBannerItem = ({ item }: { item: { uri: string; color: string } }) => (
+  const renderBannerItem = ({ item }: { item: Banner }) => (
     <View style={styles.bannerItem}>
       <Image 
         source={{ uri: item.uri }} 
         style={styles.bannerImage} 
-      />
-    </View>
-  );
-
-  return (
-    <View style={styles.container}>
-      <FlatList
-        ref={flatListRef}
-        horizontal
-        data={banners}
-        renderItem={renderBannerItem}
-        keyExtractor={(_, index) => index.toString()}
-        pagingEnabled
-        showsHorizontalScrollIndicator={false}
-        onScroll={({ nativeEvent }) => {
-          const index = Math.round(nativeEvent.contentOffset.x / Dimensions.get('window').width);
-          if (index !== activeIndex) {
-            onBannerChange(index);
-          }
-        }}
+        resizeMode="cover"
       />
       <LinearGradient
-        colors={[banners[activeIndex].color, headerColor]}
-        locations={[0, 0.7]}
-        style={styles.gradient}
-      />
-      <View style={styles.dotsContainer}>
-        {banners.map((_, index) => (
-          <View 
-            key={index} 
-            style={[
-              styles.dot,
-              index === activeIndex && styles.activeDot
-            ]}
-          />
-        ))}
-      </View>
+        colors={[
+          theme.colors.background, 
+          'transparent',
+          item.color, 
+          theme.colors.background
+        ]}
+        locations={[0, 0.5, 0.7, 0.95]}
+        style={styles.gradientOverlay}
+      >
+        <View style={styles.bannerContent}>
+          <Text style={styles.bannerTitle}>{item.bannerTitle}</Text>
+          <Text style={styles.bannerSubtitle}>
+            {item.bannerText}
+          </Text>
+          
+          <TouchableOpacity style={styles.ctaButton}>
+            <Text style={styles.ctaText}>{item.ctaText}</Text>
+            <Icon name="trending-up" color={theme.colors.background} size={16} />
+          </TouchableOpacity>
+        </View>
+      </LinearGradient>
     </View>
   );
+  const width = Dimensions.get('window').width;
+    return (
+        <View style={{ flex: 1 }}>
+            <Carousel
+                loop
+                width={width}
+                height={width}
+                autoPlay={true}
+                autoPlayInterval={3000}
+                scrollAnimationDuration={3000}
+                data={banners}
+                renderItem={renderBannerItem}
+                panGestureHandlerProps={{
+                    activeOffsetX: [-100, 100],
+                }}
+
+            />
+        </View>
+    );
 };
 
 export default BannerCarousel; 
@@ -72,11 +92,57 @@ const makeStyles = (colors: Theme['colors']) => StyleSheet.create({
     },
     bannerItem: {
       width: Dimensions.get('window').width,
-      height: 420,
+      height: Dimensions.get('window').width + 20,
+      position: 'relative',
+      overflow: 'visible',
     },
     bannerImage: {
-      flex: 1,
-      resizeMode: 'cover',
+      ...StyleSheet.absoluteFillObject,
+      width: '100%',
+      height: '100%',
+    },
+    gradientOverlay: {
+      ...StyleSheet.absoluteFillObject,
+      padding: 24,
+      justifyContent: 'flex-end',
+      paddingBottom: 40,
+    },
+    bannerContent: {
+      maxWidth: '70%',
+    },
+    bannerTitle: {
+      fontSize: 28,
+      fontWeight: '800',
+      color: colors.background,
+      lineHeight: 34,
+      marginBottom: 12,
+      textShadowColor: 'rgba(0,0,0,0.2)',
+      textShadowOffset: { width: 1, height: 1 },
+      textShadowRadius: 2,
+    },
+    bannerSubtitle: {
+      fontSize: 18,
+      color: colors.background,
+      lineHeight: 24,
+      opacity: 0.9,
+      marginBottom: 24,
+    },
+    ctaButton: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      backgroundColor: colors.primary,
+      paddingVertical: 10,
+      paddingHorizontal: 16,
+      borderRadius: 6,
+      alignSelf: 'flex-start',
+      gap: 6,
+      marginTop: 5,
+      marginBottom: 20
+    },
+    ctaText: {
+      color: colors.background,
+      fontSize: 14,
+      fontWeight: '600',
     },
     gradient: {
       position: 'absolute',

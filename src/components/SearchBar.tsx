@@ -2,6 +2,7 @@ import React from 'react';
 import { StyleSheet, TextInput, View } from 'react-native';
 import { Theme } from '../constants/Theme';
 import { useTheme } from '../contexts/ThemeContext';
+import { Icon } from '@rneui/themed';
 
 interface SearchBarProps {
   value: string;
@@ -14,10 +15,16 @@ export default function SearchBar({ value, onChangeText }: SearchBarProps) {
   
   return (
     <View style={styles.container}>
+      <Icon
+        name="search"
+        type="material"
+        color={theme.colors.textSecondary}
+        style={styles.searchIcon}
+      />
       <TextInput
         style={styles.input}
         placeholder="Search for gold shops nearby..."
-        placeholderTextColor={theme.colors.textPrimary}
+        placeholderTextColor={theme.colors.textSecondary}
         value={value}
         onChangeText={onChangeText}
       />
@@ -27,16 +34,25 @@ export default function SearchBar({ value, onChangeText }: SearchBarProps) {
 
 const makeStyles = (colours: Theme['colors']) => StyleSheet.create({
   container: {
-    color: colours.secondary,
-    padding: 10,
+    width: '100%',
+    marginBottom: 10,
+    borderRadius: 25,
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: 20,
+    borderColor: colours.primary,
+    borderWidth: 2
+
   },
   input: {
-    height: 40,
-    borderWidth: 1,
-    borderColor: colours.primary,
-    borderRadius: 8,
-    paddingHorizontal: 10,
-    backgroundColor: colours.background,
-    color: colours.textPrimary
+    flex: 1,
+    height: 52,
+    color: colours.textPrimary,
+    fontSize: 16,
+    marginLeft: 12,
+    paddingRight: 15,
+  },
+  searchIcon: {
+    marginRight: 0,
   },
 });

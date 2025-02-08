@@ -11,15 +11,17 @@ export default function DiscoverScreen() {
 
   return (
     <ScrollView contentContainerStyle={styles.container}>
-      <Text style={styles.heading}>Find the Best Gold Prices Near You</Text>
-      <Text style={styles.subtitle}>Compare prices, locate nearby shops, and get the best deals on gold purchases</Text>
-      
-      <SearchBar value='' onChangeText={() => ''}/>
+      <View style={styles.heroSection}>
+        <Text style={styles.heading}>Discover the Best Gold Prices</Text>
+        <Text style={styles.subtitle}>Compare, locate, and get the best deals from trusted shops near you.</Text>
+        
+        <SearchBar value='' onChangeText={() => ''} />
 
-      <TouchableOpacity style={styles.ctaButton}>
-        <Text style={styles.ctaText}>Find Best Deals</Text>
-        <Icon name="arrow-forward" color={theme.colors.background} />
-      </TouchableOpacity>
+        <TouchableOpacity style={styles.ctaButton}>
+          <Text style={styles.ctaText}>Find Best Deals</Text>
+          <Icon name="arrow-forward" color={theme.colors.textSecondary} size={22} />
+        </TouchableOpacity>
+      </View>
 
       <View style={styles.featuresContainer}>
         <View style={styles.featureCard}>
@@ -46,56 +48,77 @@ export default function DiscoverScreen() {
 
 const makeStyles = (colors: Theme['colors']) => StyleSheet.create({
   container: {
+    // padding: 20,
+    // paddingTop: 80,
+    alignItems: 'center',
+    backgroundColor: colors.background,
+  },
+  heroSection: {
+    width: '100%',
+    alignItems: 'center',
     padding: 20,
-    paddingTop: 40,
+    paddingTop: 80,
+    backgroundColor: colors.primary,
+    borderRadius: 16,
+    elevation: 5,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.2,
+    shadowRadius: 4,
   },
   heading: {
-    fontSize: 28,
+    fontSize: 26,
     fontWeight: 'bold',
     color: colors.textPrimary,
-    marginBottom: 15,
-    lineHeight: 34,
+    marginBottom: 10,
+    textAlign: 'center',
   },
   subtitle: {
     fontSize: 16,
     color: colors.textSecondary,
-    marginBottom: 30,
-    lineHeight: 24,
+    marginBottom: 20,
+    textAlign: 'center',
   },
   searchBar: {
+    width: '100%',
     marginBottom: 20,
   },
   ctaButton: {
     flexDirection: 'row',
     backgroundColor: colors.primary,
-    padding: 18,
+    paddingVertical: 15,
+    paddingHorizontal: 25,
     borderRadius: 12,
     alignItems: 'center',
-    justifyContent: 'space-between',
-    marginBottom: 30,
+    justifyContent: 'center',
+    width: '100%',
   },
   ctaText: {
-    color: colors.background,
+    color: colors.textSecondary,
     fontSize: 18,
     fontWeight: '600',
+    marginRight: 10,
   },
   featuresContainer: {
-    gap: 20,
+    padding: 20,
+    marginTop: 30,
+    width: '100%',
   },
   featureCard: {
     backgroundColor: colors.secondaryBackground,
     padding: 20,
     borderRadius: 12,
-    gap: 12,
+    marginBottom: 15,
   },
   featureTitle: {
     color: colors.textPrimary,
     fontSize: 18,
     fontWeight: '600',
+    marginBottom: 5,
   },
   featureText: {
     color: colors.textSecondary,
     fontSize: 14,
     lineHeight: 20,
   },
-}); 
+});

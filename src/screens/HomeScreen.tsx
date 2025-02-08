@@ -1,7 +1,7 @@
 import React, { useState, useLayoutEffect, useEffect, useRef } from 'react';
 import { StyleSheet, View, SafeAreaView, TouchableOpacity, Text, ScrollView, Image, FlatList, Dimensions } from 'react-native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
-import { RootStackParamList, Shop, TabStackParamList } from '../types';
+import { Banner, RootStackParamList, Shop, TabStackParamList } from '../types';
 import SearchBar from '../components/SearchBar';
 import ShopList from '../components/ShopList';
 import { Icon } from 'react-native-elements';
@@ -25,18 +25,27 @@ type HomeScreenProps = {
   navigation: NativeStackNavigationProp<RootStackParamList, 'MainTabs'>
 };
 
-const BANNER_IMAGES = [
+const BANNER_IMAGES: Banner[]  = [
   { 
+    bannerTitle: 'Buy Jewellery Made Simple',
+    bannerText: 'Locate nearby shops',
+    ctaText: 'Contact',
     uri: 'https://t4.ftcdn.net/jpg/05/27/71/81/360_F_527718147_x7XDK929xZnZqjgh0oPYz7xK0EvtnlIF.jpg',
     color: '#F9DEB3'
   },
   {
+    bannerTitle: 'Buy Jewellery Made Simple',
+    bannerText: 'Compare making charges',
+    ctaText: 'Contact',
     uri: 'https://cdn.shopify.com/s/files/1/1115/6326/files/B1007_Diamond_Pendants_1002_thumb_cdacec1a-3aec-487f-b9be-4c723c3801ca.jpg?v=1602840981',
     color: '#D8BAC0'
   },
   {
+    bannerTitle: 'Buy Jewellery Made Simple',
+    bannerText: 'Locate nearby shops',
+    ctaText: 'Contact',
     uri: 'https://t3.ftcdn.net/jpg/05/79/60/44/360_F_579604488_9ACQ2qfvXqH4B6VQoEi7ZG29X0qjlIfT.jpg',
-    color: '#FDFDFB' 
+    color: '#737070' 
   }
 ];
 
@@ -157,28 +166,27 @@ export default function HomeScreen({ navigation }: HomeScreenProps) {
               title="Popular Shops Near You"
               shops={shops}
               onShopPress={handleShopPress}
-              onViewAll={() => navigation.navigate('ShopList', { 
-                filter: 'nearby',
-                title: 'All Nearby Shops'
-              })}
+              onViewAll={() => console.log('View all is pressed')}
               location={location}
               showDistance={true}
             />
 
+            <MetricCards />
+
             <ShopListContainer
               title="Best Deals"
               shops={shops}
+              onViewAll={() => console.log('View all is pressed')}
               filter={s => Number(s.makingCharges) < 15}
               onShopPress={handleShopPress}
               location={location}
             />
 
             <ReachOutSection />
-            <PartnerLogos logos={PARTNER_LOGOS} />
-            <MetricCards />
+            {/* <PartnerLogos logos={PARTNER_LOGOS} /> */}
           </>
         }
-        ListFooterComponent={<View style={{ height: 80 }} />}
+        ListFooterComponent={<View style={{ height: 10 }} />}
       />
     </SafeAreaView>
   );
