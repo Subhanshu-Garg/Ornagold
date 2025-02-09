@@ -84,8 +84,8 @@ export default function ShopListScreen({ route, navigation }: ShopListScreenProp
 const makeStyles = (colors: Theme['colors']) => StyleSheet.create({
   container: {
     flex: 1,
-    padding: 15,
-    paddingTop: 40,
     backgroundColor: colors.background,
+    marginTop: 15,
+    marginLeft: 15
   },
 }); 

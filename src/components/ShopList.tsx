@@ -103,12 +103,14 @@ export default function ShopList({
       data={shops}
       renderItem={renderShopItem}
       keyExtractor={(item) => item.id}
-      contentContainerStyle={horizontal ? styles.horizontalList : styles.verticalList}
+      contentContainerStyle={
+        horizontal ? styles.horizontalList : styles.verticalList
+      }
       onEndReached={onEndReached}
-      onEndReachedThreshold={0.5}
+      onEndReachedThreshold={0.3}
       showsHorizontalScrollIndicator={false}
       ListFooterComponent={
-        !horizontal && hasMore ? <ActivityIndicator size="small" color="#0000ff" /> : null
+        !horizontal && hasMore ? <ActivityIndicator size="small" color="#0000ff" style={{ marginVertical: 10 }} /> : null
       }
     />
   );
@@ -120,6 +122,7 @@ const makeStyles = (colors: Theme['colors']) => StyleSheet.create({
   },
   verticalList: {
     paddingHorizontal: 0,
+    paddingBottom: 100
   },
   shopItem: {
     backgroundColor: colors.secondaryBackground,

@@ -54,7 +54,8 @@ export default function DiscoverScreen({
                 order: "des",
               },
             });
-          }}
+            setSearchVal('')
+          }} 
         >
           <Text style={styles.ctaText}>Find Best Deals</Text>
           <Icon
