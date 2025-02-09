@@ -64,6 +64,10 @@ export type RootStackParamList = {
       order: 'asc' | 'des'
     };
   };
+  FAQs: undefined;
+  PrivacyPolicy: undefined;
+  Settings: undefined;
+  ShopProfile: undefined;
 };
 
 export type TabStackParamList = {

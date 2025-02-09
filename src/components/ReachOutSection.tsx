@@ -4,15 +4,11 @@ import { useTheme } from '../contexts/ThemeContext';
 import { Theme } from '../constants/Theme';
 // import { Icon } from '@expo/vector-icons';
 import { Icon } from 'react-native-elements';
+import { handleContactPress } from '../helpers';
 
 const ReachOutSection = () => {
   const { theme } = useTheme();
   const styles = makeStyles(theme.colors);
-
-  const handleContactPress = () => {
-    // Implement contact logic
-    console.log('Contact support pressed');
-  };
 
   return (
     <TouchableOpacity style={styles.container} onPress={handleContactPress} activeOpacity={0.8}>

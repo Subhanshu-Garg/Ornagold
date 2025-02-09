@@ -11,6 +11,7 @@ import {
     configureReanimatedLogger,
     ReanimatedLogLevel,
   } from 'react-native-reanimated';
+import { handleContactPress } from '../helpers';
   
   // This is the default configuration
   configureReanimatedLogger({
@@ -53,7 +54,7 @@ const BannerCarousel = ({ banners, activeIndex, onBannerChange, headerColor }: P
             {item.bannerText}
           </Text>
           
-          <TouchableOpacity style={styles.ctaButton}>
+          <TouchableOpacity style={styles.ctaButton} onPress={handleContactPress}>
             <Text style={styles.ctaText}>{item.ctaText}</Text>
             <Icon name="trending-up" color={theme.colors.background} size={16} />
           </TouchableOpacity>

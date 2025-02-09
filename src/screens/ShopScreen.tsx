@@ -42,14 +42,15 @@ export default function ShopScreen({ route, navigation }: ShopScreenProps) {
 
   const styles = makeStyles(theme.colors)
 
-  // Using the custom hook for reviews
+  // Using the updated hook with automatic execution
   const {
     data: reviews,
     isLoading: isLoadingReviews,
     execute: fetchReviews
-  } = useAsync<Review[]>(useCallback(async () => {
-    return getShopReviews(shop.id);
-  }, [shop]));
+  } = useAsync<Review[]>(
+    () => getShopReviews(shop.id),
+    [shop.id] // Dependency array - will re-run when shop.id changes
+  );
 
   const handleSubmitReview = async () => {
     Keyboard.dismiss();
@@ -137,7 +138,10 @@ export default function ShopScreen({ route, navigation }: ShopScreenProps) {
   }
 
   return (
-    <ScrollView style={styles.container}>
+    <ScrollView 
+      contentContainerStyle={styles.contentContainer}
+      style={styles.container}
+    >
       <View style={styles.mapContainer}>
         <MapView
           style={styles.map}
@@ -219,6 +223,10 @@ const makeStyles = (colors: Theme['colors']) => StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: colors.background,
+  },
+  contentContainer: {
+    // padding: 16,
+    paddingBottom: 100, // Adjust based on tab bar height
   },
   mapContainer: {
     height: 200,
@@ -354,9 +362,4 @@ const makeStyles = (colors: Theme['colors']) => StyleSheet.create({
     height: 0, // Make it disappear when empty
     opacity: 0, // Hide the text
   }
-});
-
-// Add navigation options
-ShopScreen.navigationOptions = ({ route }: ShopScreenProps) => ({
-  title: route.params.shop.name
 });

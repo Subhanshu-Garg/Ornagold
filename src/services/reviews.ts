@@ -8,6 +8,7 @@ export const getShopReviews = async (shopId: string): Promise<Review[]> => {
         .from("reviews")
         .select("*")
         .eq('shopId', shopId)
+        .order('createdAt', { ascending: false })
 
     if (error) {
       throw error;

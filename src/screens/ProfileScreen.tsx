@@ -3,13 +3,14 @@ import { View, Text, TouchableOpacity, StyleSheet, ScrollView } from 'react-nati
 import { useAuth } from '../contexts/AuthContext';
 import { useTheme } from '../contexts/ThemeContext';
 import { Icon } from 'react-native-elements';
+import { Share } from 'react-native';
+import * as Linking from 'expo-linking';
 
 export default function ProfileScreen({ navigation }: any) {
   const { user, signOut } = useAuth();
   const { theme } = useTheme();
   const styles = makeStyles(theme.colors);
-//   const isShopOwner = user?.role === 'shop_owner';
-const isShopOwner = true
+  const isShopOwner = user?.role === 'shop_owner';
 
   const handleAuth = async () => {
     if (user) {
@@ -71,13 +72,18 @@ const isShopOwner = true
             icon="group-add"
             title="Invite a Friend"
             color="#4CAF50"
-            onPress={() => navigation.navigate('InviteFriends')}
+            onPress={() => {
+              Share.share({
+                message: `Check out this awesome jewelry app! Find the best gold rates and shops near you.\n\nDownload now: https://play.google.com/store/apps/details?id=com.goldapp`,
+                title: 'Share Ornagold App'
+              })
+            }}
           />
           <MenuItem
             icon="support-agent"
             title="Talk to Our Expert"
             color="#2196F3"
-            onPress={() => navigation.navigate('ExpertChat')}
+            onPress={() => Linking.openURL('tel:+917011564838')}
           />
           <MenuItem
             icon="help-center"
@@ -90,11 +96,11 @@ const isShopOwner = true
         {/* Account Management */}
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>Account</Text>
-          <MenuItem
+          {/* <MenuItem
             icon="settings"
             title="App Settings"
             onPress={() => navigation.navigate('Settings')}
-          />
+          /> */}
           <MenuItem
             icon="security"
             title="Privacy Policy"

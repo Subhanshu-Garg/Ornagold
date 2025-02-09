@@ -22,6 +22,9 @@ import { Theme } from './src/constants/Theme';
 import ShopListScreen from './src/screens/ShopListScreen';
 import * as Location from 'expo-location';
 import CustomHeader from './src/components/CustomHeader';
+import FAQsScreen from './src/screens/FAQsScreen';
+import ShopProfileScreen from './src/screens/ShopProfileScreen';
+import PrivacyPolicyScreen from './src/screens/PrivacyPolicyScreen';
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
 const Tab = createBottomTabNavigator<TabStackParamList>();
@@ -82,6 +85,37 @@ function Navigation() {
               headerShown: true
             })}
           />
+           <Stack.Screen 
+              name="FAQs" 
+              component={FAQsScreen}
+              options={{ title: 'FAQs & Support', 
+              headerStyle: {
+                backgroundColor: theme.colors.secondaryBackground
+              },
+              headerTintColor: theme.colors.textPrimary,
+              headerShown: true }}
+            />
+            <Stack.Screen 
+              name="PrivacyPolicy" 
+              component={PrivacyPolicyScreen}
+              options={{ 
+                title: 'Privacy Policy',
+                headerStyle: {
+                  backgroundColor: theme.colors.secondaryBackground
+                },
+                headerTintColor: theme.colors.textPrimary,
+                headerShown: true }}
+            />
+            {/* <Stack.Screen 
+              name="Settings" 
+              component={SettingsScreen}
+              options={{ title: 'App Settings' }}
+            /> */}
+            <Stack.Screen 
+              name="ShopProfile" 
+              component={ShopProfileScreen}
+              options={{ title: 'Shop Profile' }}
+            />
         </Stack.Navigator>
       </NavigationContainer>
     </HeaderColorProvider>

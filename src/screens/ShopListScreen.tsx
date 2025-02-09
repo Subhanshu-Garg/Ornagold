@@ -11,6 +11,7 @@ import SearchBar from '../components/SearchBar';
 import { getShops } from '../services/shops';
 import { errorHandler } from '../utils/errorHandler';
 import SectionHeader from '../components/SectionHeader';
+import LoadingSpinner from '../components/LoadingSpinner';
 
 type ShopListScreenProps = {
   navigation: NativeStackNavigationProp<RootStackParamList, 'ShopList'>;
@@ -26,6 +27,7 @@ export default function ShopListScreen({ route, navigation }: ShopListScreenProp
   const [shops, setShops] = useState<Shop[]>([]);
   const [page, setPage] = useState(1);
   const [hasMore, setHasMore] = useState(true);
+  const [isShopsLoading, setIsShopLoading] = useState(false);
 
   const loadShops = async (currentPage: number) => {
     try {
@@ -48,7 +50,9 @@ export default function ShopListScreen({ route, navigation }: ShopListScreenProp
   useEffect(() => {
     const debounceTimer = setTimeout(() => {
       setPage(1);
+      setIsShopLoading(true);
       loadShops(1);
+      setIsShopLoading(false);
     }, 500);
 
     return () => clearTimeout(debounceTimer);
@@ -60,6 +64,10 @@ export default function ShopListScreen({ route, navigation }: ShopListScreenProp
       loadShops(page + 1);
     }
   };
+
+  if(isShopsLoading) {
+    <LoadingSpinner/>
+  }
 
   return (
     <SafeAreaView style={styles.container}>

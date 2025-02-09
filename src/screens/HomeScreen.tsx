@@ -1,5 +1,5 @@
 import React, { useState, useLayoutEffect, useEffect, useRef } from 'react';
-import { StyleSheet, View, SafeAreaView, TouchableOpacity, Text, ScrollView, Image, FlatList, Dimensions } from 'react-native';
+import { StyleSheet, View, TouchableOpacity, Text, ScrollView, Image, FlatList, Dimensions, SafeAreaView } from 'react-native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { Banner, RootStackParamList, Shop, TabStackParamList } from '../types';
 import SearchBar from '../components/SearchBar';
@@ -20,6 +20,7 @@ import ShopListContainer from '../components/ShopListContainer';
 import ReachOutSection from '../components/ReachOutSection';
 import PartnerLogos from '../components/PartnerLogos';
 import MetricCards from '../components/MetricCards';
+// import { SafeAreaView } from 'react-native-safe-area-context';
 
 type HomeScreenProps = {
   navigation: NativeStackNavigationProp<RootStackParamList, 'MainTabs'>
