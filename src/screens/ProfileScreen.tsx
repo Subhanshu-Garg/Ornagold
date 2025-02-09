@@ -1,14 +1,15 @@
 import React from 'react';
-import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
+import { View, Text, TouchableOpacity, StyleSheet, ScrollView } from 'react-native';
 import { useAuth } from '../contexts/AuthContext';
 import { useTheme } from '../contexts/ThemeContext';
-import { Theme } from '../constants/Theme';
 import { Icon } from 'react-native-elements';
 
 export default function ProfileScreen({ navigation }: any) {
   const { user, signOut } = useAuth();
   const { theme } = useTheme();
   const styles = makeStyles(theme.colors);
+//   const isShopOwner = user?.role === 'shop_owner';
+const isShopOwner = true
 
   const handleAuth = async () => {
     if (user) {
@@ -20,111 +21,197 @@ export default function ProfileScreen({ navigation }: any) {
 
   return (
     <View style={styles.container}>
-      <View style={styles.header}>
-        <Icon name="person" size={60} color={theme.colors.primary} />
-        <Text style={styles.userEmail}>
-          {user?.email || 'Guest User'}
-        </Text>
-        <TouchableOpacity 
-          style={styles.authButton} 
-          onPress={handleAuth}
-        >
-          <Text style={styles.authButtonText}>
-            {user ? 'Sign Out' : 'Sign In'}
-          </Text>
-        </TouchableOpacity>
-      </View>
+      <ScrollView contentContainerStyle={styles.scrollContainer}>
+        {/* Profile Header */}
+        <View style={styles.profileHeader}>
+          <View style={styles.avatarContainer}>
+            <Icon 
+              name="person" 
+              size={40} 
+              color={theme.colors.background} 
+              containerStyle={styles.avatar}
+            />
+          </View>
+          <View style={styles.profileDetails}>
+            <Text style={styles.userName}>{user?.user_metadata?.displayName || 'Guest User'}</Text>
+            {user?.email && <Text style={styles.userDetail}>{user.email}</Text>}
+            {user?.phone && <Text style={styles.userDetail}>{user.phone}</Text>}
+          </View>
+        </View>
 
-      <View style={styles.section}>
-        <Text style={styles.sectionTitle}>Account Settings</Text>
-        <TouchableOpacity 
-          style={styles.menuItem}
-          onPress={() => navigation.navigate('AccountSettings')}
-        >
-          <Icon name="settings" style={styles.menuIcon} />
-          <Text style={styles.menuText}>Update Profile</Text>
-          <Icon name="chevron-right" />
-        </TouchableOpacity>
-      </View>
+        {/* Shop Owner Section */}
+        {isShopOwner && (
+          <View style={styles.section}>
+            <Text style={styles.sectionTitle}>Business Tools</Text>
+            <MenuItem
+              icon="store"
+              title="My Shop Profile"
+              color={theme.colors.primary}
+              onPress={() => navigation.navigate('ShopProfile')}
+            />
+            <MenuItem
+              icon="analytics"
+              title="Shop Analytics"
+              color={theme.colors.primary}
+              onPress={() => navigation.navigate('ShopAnalytics')}
+            />
+            <MenuItem
+              icon="inventory"
+              title="Manage Inventory"
+              color={theme.colors.primary}
+              onPress={() => navigation.navigate('Inventory')}
+            />
+          </View>
+        )}
 
-      <View style={styles.section}>
-        <Text style={styles.sectionTitle}>Notifications</Text>
-        <TouchableOpacity 
-          style={styles.menuItem}
-          onPress={() => navigation.navigate('NotificationSettings')}
-        >
-          <Icon name="notifications" style={styles.menuIcon} />
-          <Text style={styles.menuText}>Alert Preferences</Text>
-          <Icon name="chevron-right" />
-        </TouchableOpacity>
-      </View>
+        {/* General Features */}
+        <View style={styles.section}>
+          <Text style={styles.sectionTitle}>Features</Text>
+          <MenuItem
+            icon="group-add"
+            title="Invite a Friend"
+            color="#4CAF50"
+            onPress={() => navigation.navigate('InviteFriends')}
+          />
+          <MenuItem
+            icon="support-agent"
+            title="Talk to Our Expert"
+            color="#2196F3"
+            onPress={() => navigation.navigate('ExpertChat')}
+          />
+          <MenuItem
+            icon="help-center"
+            title="FAQs & Support"
+            color="#9C27B0"
+            onPress={() => navigation.navigate('FAQs')}
+          />
+        </View>
 
-      <View style={styles.section}>
-        <Text style={styles.sectionTitle}>Price Alerts</Text>
-        <TouchableOpacity 
-          style={styles.menuItem}
-          onPress={() => navigation.navigate('PriceAlerts')}
-        >
-          <Icon name="history" style={styles.menuIcon} />
-          <Text style={styles.menuText}>Alert History</Text>
-          <Icon name="chevron-right" />
-        </TouchableOpacity>
-      </View>
+        {/* Account Management */}
+        <View style={styles.section}>
+          <Text style={styles.sectionTitle}>Account</Text>
+          <MenuItem
+            icon="settings"
+            title="App Settings"
+            onPress={() => navigation.navigate('Settings')}
+          />
+          <MenuItem
+            icon="security"
+            title="Privacy Policy"
+            onPress={() => navigation.navigate('PrivacyPolicy')}
+          />
+          <TouchableOpacity style={styles.authButton} onPress={handleAuth}>
+            <Text style={styles.authButtonText}>
+              {user ? 'Sign Out' : 'Sign In'}
+            </Text>
+          </TouchableOpacity>
+        </View>
+      </ScrollView>
     </View>
   );
 }
 
-const makeStyles = (colors: Theme['colors']) => StyleSheet.create({
+const MenuItem = ({ icon, title, onPress, color }: any) => {
+  const { theme } = useTheme();
+  const styles = makeStyles(theme.colors);
+  return (
+    <TouchableOpacity style={styles.menuItem} onPress={onPress}>
+      <Icon name={icon} size={24} color={color || theme.colors.primary} style={styles.menuIcon} />
+      <Text style={styles.menuText}>{title}</Text>
+      <Icon name="chevron-right" size={24} color="#888" />
+    </TouchableOpacity>
+  );
+};
+
+const makeStyles = (colors: any) => StyleSheet.create({
   container: {
     flex: 1,
-    padding: 20,
     backgroundColor: colors.background,
   },
-  header: {
-    alignItems: 'center',
-    paddingVertical: 30,
-    borderBottomWidth: 1,
-    borderBottomColor: colors.primary,
-    marginBottom: 20,
-  },
-  userEmail: {
-    fontSize: 16,
-    color: colors.textPrimary,
-    marginVertical: 10,
-  },
-  authButton: {
-    backgroundColor: colors.primary,
-    paddingVertical: 10,
+  scrollContainer: {
     paddingHorizontal: 20,
-    borderRadius: 8,
-    marginTop: 10,
+    paddingTop: 20,
   },
-  authButtonText: {
-    color: colors.background,
-    fontSize: 16,
+  profileHeader: {
+    paddingTop: 50,
+    padding: 20,
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingBottom: 25,
+    marginBottom: 20,
+    borderBottomWidth: 1,
+    borderBottomColor: colors.border,
+  },
+  avatarContainer: {
+    backgroundColor: colors.primary,
+    borderRadius: 50,
+    width: 60,
+    height: 60,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginRight: 20,
+  },
+  avatar: {
+    width: 60,
+    height: 60,
+    borderRadius: 30,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  profileDetails: {
+    flex: 1,
+  },
+  userName: {
+    fontSize: 20,
+    fontWeight: '600',
+    color: colors.textPrimary,
+    marginBottom: 4,
+  },
+  userDetail: {
+    fontSize: 14,
+    color: colors.textSecondary,
+    marginBottom: 2,
   },
   section: {
     marginBottom: 25,
+    backgroundColor: colors.card,
+    borderRadius: 12,
+    padding: 15,
   },
   sectionTitle: {
-    fontSize: 18,
-    fontWeight: 'bold',
+    fontSize: 16,
+    fontWeight: '600',
     color: colors.textPrimary,
     marginBottom: 15,
+  },
+  authButton: {
+    borderWidth: 1,
+    borderColor: colors.border,
+    paddingVertical: 12,
+    borderRadius: 8,
+    alignItems: 'center',
+    marginTop: 15,
+  },
+  authButtonText: {
+    color: colors.primary,
+    fontSize: 16,
+    fontWeight: '500',
   },
   menuItem: {
     flexDirection: 'row',
     alignItems: 'center',
-    paddingVertical: 15,
-    borderBottomWidth: 1,
-    borderBottomColor: colors.primary,
+    paddingVertical: 12,
+    paddingHorizontal: 10,
   },
   menuIcon: {
     marginRight: 15,
+    width: 24,
+    alignItems: 'center',
   },
   menuText: {
     flex: 1,
     fontSize: 16,
     color: colors.textPrimary,
+    fontWeight: '500',
   },
-}); 
+});

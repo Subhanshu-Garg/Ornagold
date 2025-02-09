@@ -39,9 +39,9 @@ const BannerCarousel = ({ banners, activeIndex, onBannerChange, headerColor }: P
       />
       <LinearGradient
         colors={[
-          theme.colors.background, 
+          theme.colors.secondaryBackground, 
           'transparent',
-          item.color, 
+          'transparent', 
           theme.colors.background
         ]}
         locations={[0, 0.5, 0.7, 0.95]}

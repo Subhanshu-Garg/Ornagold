@@ -11,6 +11,7 @@ type ShopListContainerProps = {
   onShopPress: (shop: Shop) => void;
   location?: Location.LocationObject | null;
   showDistance?: boolean;
+  horizontal?: boolean;
   onViewAll?: () => void;
 };
 
@@ -22,6 +23,7 @@ const ShopListContainer = ({
   onShopPress, 
   location,
   showDistance = true,
+  horizontal = true,
   onViewAll
 }: ShopListContainerProps) => {
   const filteredShops = filter ? shops.filter(filter) : shops;

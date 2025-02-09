@@ -1,13 +1,23 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { ScrollView, View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 import { Icon } from 'react-native-elements';
 import { useTheme } from '../contexts/ThemeContext';
 import SearchBar from '../components/SearchBar';
 import { Theme } from '../constants/Theme';
+import { RouteProp } from '@react-navigation/native';
+import { RootStackParamList, Shop, TabStackParamList } from '../types';
+import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 
-export default function DiscoverScreen() {
+
+type DiscoverScreenProps = {
+    route: RouteProp<TabStackParamList, 'Discover'>;
+    navigation: NativeStackNavigationProp<RootStackParamList, 'Home'>;
+  };
+
+export default function DiscoverScreen({ route, navigation }: DiscoverScreenProps) {
   const { theme } = useTheme();
   const styles = makeStyles(theme.colors);
+  const [searchVal, setSearchVal] = useState('')
 
   return (
     <ScrollView contentContainerStyle={styles.container}>
@@ -15,9 +25,16 @@ export default function DiscoverScreen() {
         <Text style={styles.heading}>Discover the Best Gold Prices</Text>
         <Text style={styles.subtitle}>Compare, locate, and get the best deals from trusted shops near you.</Text>
         
-        <SearchBar value='' onChangeText={() => ''} />
+        <SearchBar value={searchVal} onChangeText={(text) => setSearchVal(text)} />
 
-        <TouchableOpacity style={styles.ctaButton}>
+        <TouchableOpacity style={styles.ctaButton} onPress={() => navigation.navigate('ShopList', {  
+            title: 'Search Results...',
+            searchQuery: searchVal,
+            sort: {
+              field: 'updatedAt',
+              order: 'des'
+            }
+        })}>
           <Text style={styles.ctaText}>Find Best Deals</Text>
           <Icon name="arrow-forward" color={theme.colors.textSecondary} size={22} />
         </TouchableOpacity>

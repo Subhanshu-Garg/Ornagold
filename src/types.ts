@@ -51,6 +51,19 @@ export type RootStackParamList = {
   Shop: { shop: Shop };
   Auth: undefined;
   Home: undefined;
+  ShopList: {
+    title: string;
+    searchQuery?: string;
+    filters?: {
+      field: string;
+      operator: string;
+      value: any;
+    }[];
+    sort?: {
+      field: string;
+      order: 'asc' | 'des'
+    };
+  };
 };
 
 export type TabStackParamList = {

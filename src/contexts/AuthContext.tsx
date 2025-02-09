@@ -105,7 +105,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
         } else {
           console.log('Inside sign up for phone')
           const { error } = await supabase.auth.signUp({
-            phone: `${+91}params.phone`,
+            phone: `+91${params.phone}`,
             password: params.password,
             options: {
               data: {

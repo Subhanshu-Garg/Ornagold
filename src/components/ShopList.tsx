@@ -51,7 +51,7 @@ export default function ShopList({
 
   const renderShopItem = ({ item }: { item: Shop }) => (
     <TouchableOpacity
-      style={[styles.shopItem, horizontal && styles.horizontalItem]}
+      style={[styles.shopItem, horizontal ? styles.horizontalItem : styles.verticalItem]}
       onPress={() => handleShopPress(item)}
     >
       <Image
@@ -99,6 +99,7 @@ export default function ShopList({
   return (
     <FlatList
       horizontal={horizontal}
+      numColumns={!horizontal ? 2 : undefined}
       data={shops}
       renderItem={renderShopItem}
       keyExtractor={(item) => item.id}
@@ -118,7 +119,7 @@ const makeStyles = (colors: Theme['colors']) => StyleSheet.create({
     paddingLeft: 15,
   },
   verticalList: {
-    padding: 10,
+    paddingHorizontal: 0,
   },
   shopItem: {
     backgroundColor: colors.secondaryBackground,
@@ -129,11 +130,12 @@ const makeStyles = (colors: Theme['colors']) => StyleSheet.create({
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
     shadowRadius: 4,
-  },
-  horizontalItem: {
     width: (Dimensions.get('window').width - 45) / 2,
     marginRight: 15,
     height: 260,
+  },
+  horizontalItem: {
+    marginRight: 15,
   },
   shopImage: {
     width: '100%',
@@ -180,5 +182,9 @@ const makeStyles = (colors: Theme['colors']) => StyleSheet.create({
     color: colors.textPrimary,
     fontSize: 12,
     fontWeight: '500',
+  },
+  verticalItem: {
+    width: (Dimensions.get('window').width - 45) / 2,
+    marginBottom: 10,
   },
 });

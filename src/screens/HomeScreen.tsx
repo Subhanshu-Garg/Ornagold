@@ -166,7 +166,9 @@ export default function HomeScreen({ navigation }: HomeScreenProps) {
               title="Popular Shops Near You"
               shops={shops}
               onShopPress={handleShopPress}
-              onViewAll={() => console.log('View all is pressed')}
+              onViewAll={() => navigation.navigate('ShopList',  {
+                title: 'Popular Shops Near You'
+              })}
               location={location}
               showDistance={true}
             />

@@ -19,6 +19,7 @@ import { HeaderColorProvider, useHeaderColor } from './src/contexts/HeaderColorC
 import { View, Text, Image, StyleSheet } from 'react-native';
 import { Colors } from './src/constants/Colors';
 import { Theme } from './src/constants/Theme';
+import ShopListScreen from './src/screens/ShopListScreen';
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
 const Tab = createBottomTabNavigator<TabStackParamList>();
@@ -31,7 +32,7 @@ function CustomHeader() {
   const { theme } = useTheme()
   const styles = makeStyles(theme.colors)
   return (
-    <View style={styles.header}>
+    <View style={[styles.header, { backgroundColor: theme.colors.secondaryBackground}]}>
       <Image 
         source={require('./assets/images/logo.png')}
         style={styles.logo}
@@ -79,6 +80,18 @@ function Navigation() {
                 backgroundColor: theme.colors.primary
               },
               headerTintColor: theme.colors.background,
+              headerShown: true
+            })}
+          />
+          <Stack.Screen 
+            name="ShopList" 
+            component={ShopListScreen}
+            options={({ navigation, route }) => ({ 
+              title: route.params.title,
+              headerStyle: {
+                backgroundColor: theme.colors.secondaryBackground
+              },
+              headerTintColor: theme.colors.textPrimary,
               headerShown: true
             })}
           />
