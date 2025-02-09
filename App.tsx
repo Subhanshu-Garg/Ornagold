@@ -25,6 +25,7 @@ import CustomHeader from './src/components/CustomHeader';
 import FAQsScreen from './src/screens/FAQsScreen';
 import ShopProfileScreen from './src/screens/ShopProfileScreen';
 import PrivacyPolicyScreen from './src/screens/PrivacyPolicyScreen';
+import * as Updates from 'expo-updates';
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
 const Tab = createBottomTabNavigator<TabStackParamList>();
@@ -158,6 +159,22 @@ function TabNavigator() {
 }
 
 export default function AppWrapper() {
+
+  useEffect(() => {
+    async function checkUpdates() {
+      try {
+        const update = await Updates.checkForUpdateAsync();
+        if (update.isAvailable) {
+          await Updates.fetchUpdateAsync();
+          await Updates.reloadAsync();
+        }
+      } catch (error) {
+        console.error('Error checking for updates:', error);
+      }
+    }
+    
+    checkUpdates();
+  }, []);
   return (
     <ThemeProvider>
       <AuthProvider>
@@ -168,38 +185,3 @@ export default function AppWrapper() {
     </ThemeProvider>
   );
 }
-
-const makeStyles = (colors: Theme['colors']) => StyleSheet.create({
-  header: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    padding: 10,
-    paddingTop: 50,
-    backgroundColor: colors.secondaryBackground,
-    top: 0,
-    left: 0,
-    right: 0,
-    zIndex: 1000,
-  },
-  headerTitle: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    color: colors.primary,
-    letterSpacing: 1.5,
-  },
-  cityTag: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: colors.background,
-    paddingVertical: 6,
-    paddingHorizontal: 12,
-    borderRadius: 20,
-    marginLeft: 'auto',
-    gap: 4
-  },
-  cityText: {
-    fontSize: 14,
-    fontWeight: '500',
-    color: colors.primary
-  }
-});

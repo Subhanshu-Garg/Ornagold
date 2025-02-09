@@ -2,7 +2,7 @@ export default {
   "expo": {
     "name": "Ornagold",
     "slug": "ornagold",
-    "version": "1.0.0",
+    "version": "1.0.1",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
     "scheme": "myapp",
@@ -17,7 +17,7 @@ export default {
     },
     "android": {
       "package": "com.ornagold.app",
-      "versionCode": 1,
+      "versionCode": 2,
       "adaptiveIcon": {
         "foregroundImage": "./assets/images/adaptive-icon.png",
         "backgroundColor": "#eae0cd"
@@ -29,7 +29,9 @@ export default {
       },
       "permissions": [
         "ACCESS_COARSE_LOCATION",
-        "ACCESS_FINE_LOCATION"
+        "ACCESS_FINE_LOCATION",
+        "READ_EXTERNAL_STORAGE",
+        "WRITE_EXTERNAL_STORAGE"
       ]
     },
     "ios": {
@@ -78,7 +80,8 @@ export default {
         {
           "locationAlwaysAndWhenInUsePermission": "Allow $(PRODUCT_NAME) to use your location."
         }
-      ]
+      ],
+      "expo-updates"
     ],
     "experiments": {
       "typedRoutes": true
@@ -88,7 +91,8 @@ export default {
       "policy": "appVersion"
     },
     "updates": {
-      "url": "https://u.expo.dev/5782fe14-d5ee-4ead-bd28-2181e17c5eb1"
+      "url": "https://u.expo.dev/5782fe14-d5ee-4ead-bd28-2181e17c5eb1",
+      "fallbackToCacheTimeout": 0
     }
   }
 };
