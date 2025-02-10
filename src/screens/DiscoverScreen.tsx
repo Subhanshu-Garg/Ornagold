@@ -60,7 +60,7 @@ export default function DiscoverScreen({
           <Text style={styles.ctaText}>Find Best Deals</Text>
           <Icon
             name="arrow-forward"
-            color={theme.colors.textSecondary}
+            color={theme.colors.darkGray}
             size={22}
           />
         </TouchableOpacity>
@@ -119,13 +119,13 @@ const makeStyles = (colors: Theme["colors"]) =>
     heading: {
       fontSize: 26,
       fontWeight: "bold",
-      color: colors.textPrimary,
+      color: colors.pureBlack,
       marginBottom: 10,
       textAlign: "center",
     },
     subtitle: {
       fontSize: 16,
-      color: colors.textSecondary,
+      color: colors.darkGray,
       marginBottom: 20,
       textAlign: "center",
     },
@@ -144,7 +144,7 @@ const makeStyles = (colors: Theme["colors"]) =>
       width: "100%",
     },
     ctaText: {
-      color: colors.textSecondary,
+      color: colors.darkGray,
       fontSize: 18,
       fontWeight: "600",
       marginRight: 10,

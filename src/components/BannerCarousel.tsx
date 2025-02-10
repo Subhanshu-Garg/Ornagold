@@ -1,23 +1,31 @@
-import React, { useRef } from 'react';
-import { FlatList, View, Text, Image, Dimensions, StyleSheet, TouchableOpacity } from 'react-native';
-import { useTheme } from '../contexts/ThemeContext';
-import { LinearGradient } from 'expo-linear-gradient';
-import { Theme } from '../constants/Theme';
-import Carousel from 'react-native-reanimated-carousel';
-import { Icon } from '@rneui/themed';
-import { Banner } from '../types';
+import React, { useRef } from "react";
+import {
+  FlatList,
+  View,
+  Text,
+  Image,
+  Dimensions,
+  StyleSheet,
+  TouchableOpacity,
+} from "react-native";
+import { useTheme } from "../contexts/ThemeContext";
+import { LinearGradient } from "expo-linear-gradient";
+import { Theme } from "../constants/Theme";
+import Carousel from "react-native-reanimated-carousel";
+import { Icon } from "@rneui/themed";
+import { Banner } from "../types";
 
 import {
-    configureReanimatedLogger,
-    ReanimatedLogLevel,
-  } from 'react-native-reanimated';
-import { handleContactPress } from '../helpers';
-  
-  // This is the default configuration
-  configureReanimatedLogger({
-    level: ReanimatedLogLevel.warn,
-    strict: false, // Reanimated runs in strict mode by default
-  });
+  configureReanimatedLogger,
+  ReanimatedLogLevel,
+} from "react-native-reanimated";
+import { handleContactPress } from "../helpers";
+
+// This is the default configuration
+configureReanimatedLogger({
+  level: ReanimatedLogLevel.warn,
+  strict: false, // Reanimated runs in strict mode by default
+});
 
 type Props = {
   banners: Banner[];
@@ -26,98 +34,107 @@ type Props = {
   headerColor: string;
 };
 
-const BannerCarousel = ({ banners, activeIndex, onBannerChange, headerColor }: Props) => {
+const BannerCarousel = ({
+  banners,
+  activeIndex,
+  onBannerChange,
+  headerColor,
+}: Props) => {
   const { theme } = useTheme();
   const flatListRef = useRef<FlatList>(null);
   const styles = makeStyles(theme.colors);
 
   const renderBannerItem = ({ item }: { item: Banner }) => (
     <View style={styles.bannerItem}>
-      <Image 
-        source={{ uri: item.uri }} 
-        style={styles.bannerImage} 
+      <Image
+        source={{ uri: item.uri }}
+        style={styles.bannerImage}
         resizeMode="cover"
       />
       <LinearGradient
         colors={[
-          theme.colors.secondaryBackground, 
-          'transparent',
-          'transparent', 
-          theme.colors.background
+          theme.colors.secondaryBackground,
+          "transparent",
+          "transparent",
+          theme.colors.background,
         ]}
         locations={[0, 0.5, 0.7, 0.95]}
         style={styles.gradientOverlay}
       >
         <View style={styles.bannerContent}>
           <Text style={styles.bannerTitle}>{item.bannerTitle}</Text>
-          <Text style={styles.bannerSubtitle}>
-            {item.bannerText}
-          </Text>
-          
-          <TouchableOpacity style={styles.ctaButton} onPress={handleContactPress}>
+          <Text style={styles.bannerSubtitle}>{item.bannerText}</Text>
+
+          <TouchableOpacity
+            style={styles.ctaButton}
+            onPress={() => handleContactPress()}
+          >
             <Text style={styles.ctaText}>{item.ctaText}</Text>
-            <Icon name="trending-up" color={theme.colors.background} size={16} />
+            <Icon
+              name="trending-up"
+              color={theme.colors.background}
+              size={16}
+            />
           </TouchableOpacity>
         </View>
       </LinearGradient>
     </View>
   );
-  const width = Dimensions.get('window').width;
-    return (
-        <View style={{ flex: 1 }}>
-            <Carousel
-                loop
-                width={width}
-                height={width}
-                autoPlay={true}
-                autoPlayInterval={3000}
-                scrollAnimationDuration={3000}
-                data={banners}
-                renderItem={renderBannerItem}
-                panGestureHandlerProps={{
-                    activeOffsetX: [-100, 100],
-                }}
-
-            />
-        </View>
-    );
+  const width = Dimensions.get("window").width;
+  return (
+    <View style={{ flex: 1 }}>
+      <Carousel
+        loop
+        width={width}
+        height={width}
+        autoPlay={true}
+        autoPlayInterval={3000}
+        scrollAnimationDuration={3000}
+        data={banners}
+        renderItem={renderBannerItem}
+        panGestureHandlerProps={{
+          activeOffsetX: [-100, 100],
+        }}
+      />
+    </View>
+  );
 };
 
-export default BannerCarousel; 
+export default BannerCarousel;
 
-
-const makeStyles = (colors: Theme['colors']) => StyleSheet.create({
+const makeStyles = (colors: Theme["colors"]) =>
+  StyleSheet.create({
     container: {
       height: 420,
       marginBottom: 10,
     },
     bannerItem: {
-      width: Dimensions.get('window').width,
-      height: Dimensions.get('window').width + 20,
-      position: 'relative',
-      overflow: 'visible',
+      width: Dimensions.get("window").width,
+      height: Dimensions.get("window").width + 20,
+      position: "relative",
+      overflow: "visible",
     },
     bannerImage: {
       ...StyleSheet.absoluteFillObject,
-      width: '100%',
-      height: '100%',
+      width: "100%",
+      height: "100%",
     },
     gradientOverlay: {
       ...StyleSheet.absoluteFillObject,
       padding: 24,
-      justifyContent: 'flex-end',
+      justifyContent: "flex-end",
       paddingBottom: 40,
     },
     bannerContent: {
-      maxWidth: '70%',
+      maxWidth: "70%",
     },
     bannerTitle: {
       fontSize: 28,
-      fontWeight: '800',
+      fontWeight: "800",
       color: colors.background,
       lineHeight: 34,
       marginBottom: 12,
-      textShadowColor: 'rgba(0,0,0,0.2)',
+      textShadowColor: "rgba(0,0,0,0.2)",
       textShadowOffset: { width: 1, height: 1 },
       textShadowRadius: 2,
     },
@@ -129,24 +146,24 @@ const makeStyles = (colors: Theme['colors']) => StyleSheet.create({
       marginBottom: 24,
     },
     ctaButton: {
-      flexDirection: 'row',
-      alignItems: 'center',
+      flexDirection: "row",
+      alignItems: "center",
       backgroundColor: colors.primary,
       paddingVertical: 10,
       paddingHorizontal: 16,
       borderRadius: 6,
-      alignSelf: 'flex-start',
+      alignSelf: "flex-start",
       gap: 6,
       marginTop: 5,
-      marginBottom: 20
+      marginBottom: 20,
     },
     ctaText: {
       color: colors.background,
       fontSize: 14,
-      fontWeight: '600',
+      fontWeight: "600",
     },
     gradient: {
-      position: 'absolute',
+      position: "absolute",
       bottom: 0,
       left: 0,
       right: 0,
@@ -154,12 +171,12 @@ const makeStyles = (colors: Theme['colors']) => StyleSheet.create({
       zIndex: 1,
     },
     dotsContainer: {
-      position: 'absolute',
+      position: "absolute",
       bottom: 20,
       left: 0,
       right: 0,
-      flexDirection: 'row',
-      justifyContent: 'center',
+      flexDirection: "row",
+      justifyContent: "center",
       zIndex: 2,
     },
     dot: {
@@ -172,4 +189,4 @@ const makeStyles = (colors: Theme['colors']) => StyleSheet.create({
     activeDot: {
       backgroundColor: colors.primary,
     },
-  })
+  });

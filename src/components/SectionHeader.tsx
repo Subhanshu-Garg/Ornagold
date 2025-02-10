@@ -31,6 +31,7 @@ const makeStyles = (colors: Theme['colors']) => StyleSheet.create({
     alignItems: 'center',
     paddingHorizontal: 15,
     marginVertical: 10,
+    paddingTop: 15
   },
   sectionTitle: {
     fontSize: 20,

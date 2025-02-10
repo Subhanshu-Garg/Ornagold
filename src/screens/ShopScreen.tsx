@@ -24,6 +24,7 @@ import useAsync from '../hooks/useAsync';
 import LoadingSpinner from '../components/LoadingSpinner';
 import { useTheme } from '../contexts/ThemeContext';
 import { Theme } from '../constants/Theme';
+import { handleContactPress } from '../helpers';
 
 type ShopScreenProps = {
   route: RouteProp<RootStackParamList, 'Shop'>;
@@ -110,21 +111,6 @@ export default function ShopScreen({ route, navigation }: ShopScreenProps) {
     );
   };
 
-  const handleCallPress = async (phoneNum: string) => {
-    try {
-      const phoneNumber = `tel:${phoneNum}`;
-      console.log(phoneNumber)
-      const supported = await Linking.canOpenURL(phoneNumber);
-      if (supported) {
-        await Linking.openURL(phoneNumber);
-      } else {
-        console.info('Phone calls are not supported on this device');
-      }
-    } catch (error) {
-      console.error('Error making call:', error);
-    }
-  };
-
   if (!shop) {
     return (
       <View style={styles.container}>
@@ -173,7 +159,7 @@ export default function ShopScreen({ route, navigation }: ShopScreenProps) {
           </View>
           <TouchableOpacity
             style={styles.callButton}
-            onPress={() => protectedAction(() => handleCallPress(shop.phone))}
+            onPress={() => protectedAction(() => handleContactPress(shop.phone))}
           >
             <Icon name="call" size={24} color={theme.colors.background} />
           </TouchableOpacity>

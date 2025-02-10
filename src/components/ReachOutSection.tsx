@@ -11,7 +11,7 @@ const ReachOutSection = () => {
   const styles = makeStyles(theme.colors);
 
   return (
-    <TouchableOpacity style={styles.container} onPress={handleContactPress} activeOpacity={0.8}>
+    <TouchableOpacity style={styles.container} onPress={() => handleContactPress()} activeOpacity={0.8}>
       <Image
         source={require('../../assets/images/contact-support.png')}
         style={styles.backgroundImage}
@@ -66,7 +66,7 @@ const makeStyles = (colors: Theme['colors']) => StyleSheet.create({
   contactButton: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: colors.primary,
+    backgroundColor: 'transparent',
     borderRadius: 8,
     width: '30%',
     position: 'absolute',

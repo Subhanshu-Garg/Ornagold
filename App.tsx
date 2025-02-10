@@ -26,6 +26,7 @@ import FAQsScreen from './src/screens/FAQsScreen';
 import ShopProfileScreen from './src/screens/ShopProfileScreen';
 import PrivacyPolicyScreen from './src/screens/PrivacyPolicyScreen';
 import * as Updates from 'expo-updates';
+import Constants from 'expo-constants';
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
 const Tab = createBottomTabNavigator<TabStackParamList>();
@@ -161,6 +162,11 @@ function TabNavigator() {
 export default function AppWrapper() {
 
   useEffect(() => {
+    if (Constants.executionEnvironment !== 'standalone') {
+      console.log('Skipping update check in Expo Go');
+      return;
+    }
+
     async function checkUpdates() {
       try {
         const update = await Updates.checkForUpdateAsync();
@@ -169,7 +175,7 @@ export default function AppWrapper() {
           await Updates.reloadAsync();
         }
       } catch (error) {
-        console.error('Error checking for updates:', error);
+        console.log('Update check error:', error);
       }
     }
     

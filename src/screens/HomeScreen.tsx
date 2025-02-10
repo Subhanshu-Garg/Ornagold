@@ -1,5 +1,5 @@
 import React, { useState, useLayoutEffect, useEffect, useRef } from 'react';
-import { StyleSheet, View, TouchableOpacity, Text, ScrollView, Image, FlatList, Dimensions, SafeAreaView } from 'react-native';
+import { StyleSheet, View, TouchableOpacity, Text, ScrollView, Image, FlatList, Dimensions, SafeAreaView, Platform } from 'react-native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { Banner, RootStackParamList, Shop, TabStackParamList } from '../types';
 import SearchBar from '../components/SearchBar';
@@ -145,7 +145,7 @@ export default function HomeScreen({ navigation }: HomeScreenProps) {
   } 
 
   return (
-    <SafeAreaView style={styles.container}>
+    <View style={styles.container}>
       <FlatList
         data={[]}
         renderItem={null}
@@ -185,15 +185,14 @@ export default function HomeScreen({ navigation }: HomeScreenProps) {
         }
         ListFooterComponent={<View style={{ height: 10 }} />}
       />
-    </SafeAreaView>
+    </View>
   );
 }
 
 const makeStyles = (colors: Theme['colors']) => StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: colors.background,
-    paddingTop: 0,
+    backgroundColor: colors.background
   },
   headerButton: {
     flexDirection: 'row',
@@ -371,7 +370,6 @@ const makeStyles = (colors: Theme['colors']) => StyleSheet.create({
     alignItems: 'center',
     padding: 15,
     backgroundColor: 'transparent', // Semi-transparent white
-    marginTop: 50, // Add space for system status bar
     borderRadius: 10,
     marginHorizontal: 15,
     zIndex: 2,

@@ -4,7 +4,7 @@ import { useAuth } from '../contexts/AuthContext';
 import { useTheme } from '../contexts/ThemeContext';
 import { Icon } from 'react-native-elements';
 import { Share } from 'react-native';
-import * as Linking from 'expo-linking';
+import { handleContactPress } from '../helpers';
 
 export default function ProfileScreen({ navigation }: any) {
   const { user, signOut } = useAuth();
@@ -83,7 +83,7 @@ export default function ProfileScreen({ navigation }: any) {
             icon="support-agent"
             title="Talk to Our Expert"
             color="#2196F3"
-            onPress={() => Linking.openURL('tel:+917011564838')}
+            onPress={() => handleContactPress()}
           />
           <MenuItem
             icon="help-center"

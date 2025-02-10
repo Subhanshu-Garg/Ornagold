@@ -1,9 +1,11 @@
-import { Linking } from "react-native";
+import * as Linking from 'expo-linking';
 
-export const handleContactPress = async () => {
+export const handleContactPress = async (phoneNum: string | void) => {
     try {
-      const phoneNumber = 'tel:+917011564838';
-      const supported = await Linking.canOpenURL(phoneNumber);
+      const rawNumber = phoneNum || '+917011564838'; // Default without country code
+      const sanitized = sanitizePhoneNum(rawNumber);
+      const phoneNumber = `tel:${sanitized}`;
+      const supported = await Linking.canOpenURL(phoneNumber)
       
       if (supported) {
         await Linking.openURL(phoneNumber);
@@ -14,3 +16,17 @@ export const handleContactPress = async () => {
       console.error('Error opening dialer:', error);
     }
   };
+
+export const sanitizePhoneNum = (phoneNum: string) => {
+  // Remove all non-digit characters except potential leading +
+  const cleaned = phoneNum.replace(/[^\d+]/g, '');
+  
+  // Handle cases where number starts with + followed by country code
+  if (cleaned.startsWith('+')) {
+    const digitsAfterPlus = cleaned.slice(1).replace(/\D/g, '');
+    return `+${digitsAfterPlus}`;
+  }
+  
+  // Remove any remaining non-digit characters for local numbers
+  return cleaned.replace(/\D/g, '');
+};

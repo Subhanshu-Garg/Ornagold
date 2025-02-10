@@ -1,6 +1,6 @@
 export const Colors = {
   // Brand colours
-  driftwood_1: '#eab308',
+  driftwood_1: '#f9b800',
   laser_2: '#d1b178',
   calico_3: '#e2c99a',
   starkWhite_4: '#fcf7f0',

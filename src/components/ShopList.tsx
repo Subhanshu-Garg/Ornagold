@@ -133,7 +133,7 @@ const makeStyles = (colors: Theme['colors']) => StyleSheet.create({
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
     shadowRadius: 4,
-    width: (Dimensions.get('window').width - 45) / 2,
+    width: (Dimensions.get('window').width - 55) / 2,
     marginRight: 15,
     height: 260,
   },

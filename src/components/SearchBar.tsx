@@ -18,13 +18,14 @@ export default function SearchBar({ value, onChangeText }: SearchBarProps) {
       <Icon
         name="search"
         type="material"
-        color={theme.colors.textSecondary}
+        color={theme.colors.darkGray}
         style={styles.searchIcon}
       />
       <TextInput
+        autoFocus
         style={styles.input}
         placeholder="Search for gold shops nearby..."
-        placeholderTextColor={theme.colors.textSecondary}
+        placeholderTextColor={theme.colors.darkGray}
         value={value}
         onChangeText={onChangeText}
       />
@@ -40,14 +41,13 @@ const makeStyles = (colours: Theme['colors']) => StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     paddingHorizontal: 20,
-    borderColor: colours.primary,
-    borderWidth: 2
-
+    borderColor: colours.darkGray,
+    borderWidth: 1
   },
   input: {
     flex: 1,
     height: 52,
-    color: colours.textPrimary,
+    color: colours.darkGray,
     fontSize: 16,
     marginLeft: 12,
     paddingRight: 15,
