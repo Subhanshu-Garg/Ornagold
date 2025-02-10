@@ -7,9 +7,10 @@ import { Icon } from '@rneui/themed';
 interface SearchBarProps {
   value: string;
   onChangeText: (text: string) => void;
+  onSubmit: () => Promise<any>
 }
 
-export default function SearchBar({ value, onChangeText }: SearchBarProps) {
+export default function SearchBar({ value, onChangeText, onSubmit }: SearchBarProps) {
   const { theme } = useTheme()
   const styles = makeStyles(theme.colors)
   
@@ -22,12 +23,14 @@ export default function SearchBar({ value, onChangeText }: SearchBarProps) {
         style={styles.searchIcon}
       />
       <TextInput
-        autoFocus
         style={styles.input}
         placeholder="Search for gold shops nearby..."
         placeholderTextColor={theme.colors.darkGray}
         value={value}
         onChangeText={onChangeText}
+        onSubmitEditing={onSubmit}
+        submitBehavior='blurAndSubmit'
+        returnKeyType='search'
       />
     </View>
   );

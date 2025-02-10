@@ -21,7 +21,7 @@ export type Theme = {
 // Use Pick to extract only the common color properties
 type CommonColors = Pick<
   Theme['colors'],
-  'primary' | 'secondary' | 'success' | 'error' | 'pureBlack' | 'pureWhite' | 'primaryDark'
+  'primary' | 'secondary' | 'success' | 'error' | 'pureBlack' | 'pureWhite' | 'primaryDark' | 'darkGray'
 >;
 
 const commonColors: CommonColors = {

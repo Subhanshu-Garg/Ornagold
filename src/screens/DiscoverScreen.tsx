@@ -27,8 +27,23 @@ export default function DiscoverScreen({
   const styles = makeStyles(theme.colors);
   const [searchVal, setSearchVal] = useState("");
 
+  const handleSearchSubmit = async () => {
+    if (!searchVal) {
+      return;
+    }
+    navigation.navigate("ShopList", {
+      title: "Search Results...",
+      searchQuery: searchVal,
+      sort: {
+        field: "updatedAt",
+        order: "des",
+      },
+    });
+    setSearchVal('')
+  }
+
   return (
-    <ScrollView contentContainerStyle={styles.container}>
+    <ScrollView contentContainerStyle={styles.container} keyboardShouldPersistTaps='handled'>
       <View style={styles.heroSection}>
         <Text style={styles.heading}>Discover the Best Gold Prices</Text>
         <Text style={styles.subtitle}>
@@ -38,24 +53,12 @@ export default function DiscoverScreen({
         <SearchBar
           value={searchVal}
           onChangeText={(text) => setSearchVal(text)}
+          onSubmit={handleSearchSubmit}
         />
 
         <TouchableOpacity
           style={styles.ctaButton}
-          onPress={() => {
-            if (!searchVal) {
-              return;
-            }
-            navigation.navigate("ShopList", {
-              title: "Search Results...",
-              searchQuery: searchVal,
-              sort: {
-                field: "updatedAt",
-                order: "des",
-              },
-            });
-            setSearchVal('')
-          }} 
+          onPress={handleSearchSubmit}
         >
           <Text style={styles.ctaText}>Find Best Deals</Text>
           <Icon

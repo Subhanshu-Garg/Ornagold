@@ -37,7 +37,7 @@ export default function CustomHeader() {
       height: insets.top + 60
     }]}>
       <Image 
-        source={require('../../assets/images/ornagold-logo.png')}
+        source={require('../../assets/images/adaptive-icon.png')}
         style={styles.logo}
       />
       {/* <Image 
@@ -69,7 +69,7 @@ const makeStyles = (colors: Theme['colors']) => StyleSheet.create({
   },
   logo: {
     width: 40,
-    height: 70,
+    height: 40,
     marginRight: 10,
   },
   name: {
