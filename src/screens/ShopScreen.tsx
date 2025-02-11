@@ -98,7 +98,7 @@ export default function ShopScreen({ route, navigation }: ShopScreenProps) {
           {[1, 2, 3, 4, 5].map((star) => (
             <TouchableOpacity
               key={star}
-              onPress={() => setRating(star)}
+              onPressIn={() => setRating(star)}
               style={styles.starButton}
             >
               <Text style={[styles.starText, { color: star <= rating ? '#FFD700' : '#CCCCCC' }]}>
@@ -125,6 +125,7 @@ export default function ShopScreen({ route, navigation }: ShopScreenProps) {
 
   return (
     <ScrollView 
+      keyboardShouldPersistTaps='handled'
       contentContainerStyle={styles.contentContainer}
       style={styles.container}
     >
