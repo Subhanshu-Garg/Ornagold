@@ -25,6 +25,7 @@ import LoadingSpinner from '../components/LoadingSpinner';
 import { useTheme } from '../contexts/ThemeContext';
 import { Theme } from '../constants/Theme';
 import { handleContactPress } from '../helpers';
+import useStatusBarColor from '../hooks/useStatusBarColor';
 
 type ShopScreenProps = {
   route: RouteProp<RootStackParamList, 'Shop'>;
@@ -42,6 +43,7 @@ export default function ShopScreen({ route, navigation }: ShopScreenProps) {
   const { theme } = useTheme();
 
   const styles = makeStyles(theme.colors)
+  useStatusBarColor(theme.colors.primary)
 
   // Using the updated hook with automatic execution
   const {

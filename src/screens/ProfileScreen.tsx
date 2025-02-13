@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, ScrollView } from 'react-native';
 import { useAuth } from '../contexts/AuthContext';
 import { useTheme } from '../contexts/ThemeContext';
@@ -8,6 +8,9 @@ import { handleContactPress } from '../helpers';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import type { RootStackParamList } from '../types';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import EditProfileModal from '../components/EditProfileModal';
+import { Theme } from '../constants/Theme';
+import useStatusBarColor from '../hooks/useStatusBarColor';
 
 type ProfileScreenNavigationProp = NativeStackNavigationProp<RootStackParamList>;
 
@@ -20,6 +23,8 @@ export default function ProfileScreen({ navigation }: ProfileScreenProps) {
   const { theme } = useTheme();
   const styles = makeStyles(theme.colors);
   const isShopOwner = true
+  const [isEditModalVisible, setEditModalVisible] = useState(false);
+  useStatusBarColor(theme.colors.primary)
 
   const handleAuth = async () => {
     if (user) {
@@ -33,20 +38,28 @@ export default function ProfileScreen({ navigation }: ProfileScreenProps) {
     <SafeAreaView style={styles.container}>
       <ScrollView contentContainerStyle={styles.scrollContainer}>
         {/* Profile Header */}
-        <View style={styles.profileHeader}>
-          <View style={styles.avatarContainer}>
-            <Icon 
-              name="person" 
-              size={40} 
-              color={theme.colors.background} 
-              containerStyle={styles.avatar}
-            />
-          </View>
-          <View style={styles.profileDetails}>
-            <Text style={styles.userName}>{user?.user_metadata?.displayName || 'Guest User'}</Text>
-            {user?.email && <Text style={styles.userDetail}>{user.email}</Text>}
-            {user?.phone && <Text style={styles.userDetail}>{user.phone}</Text>}
-          </View>
+        <View style={styles.profileBackground}>
+          <View style={styles.profileHeader}>
+            <View style={styles.avatarContainer}>
+              <Icon 
+                name="person" 
+                size={40} 
+                color={theme.colors.background} 
+                containerStyle={styles.avatar}
+              />
+              <TouchableOpacity 
+                style={styles.editIcon}
+                onPress={() => setEditModalVisible(true)}
+              >
+                <Icon name="edit" size={16} color={theme.colors.primary} />
+              </TouchableOpacity>
+            </View>
+            <View style={styles.profileDetails}>
+              <Text style={styles.userName}>{user?.user_metadata?.displayName || 'Guest User'}</Text>
+              {user?.email && <Text style={styles.userDetail}>{user.email}</Text>}
+              {user?.phone && <Text style={styles.userDetail}>{user.phone}</Text>}
+            </View>
+          </View> 
         </View>
 
         {/* Shop Owner Section */}
@@ -132,6 +145,11 @@ export default function ProfileScreen({ navigation }: ProfileScreenProps) {
           </TouchableOpacity>
         </View>
       </ScrollView>
+
+      <EditProfileModal
+        isVisible={isEditModalVisible}
+        onClose={() => setEditModalVisible(false)}
+      />
     </SafeAreaView>
   );
 }
@@ -148,29 +166,43 @@ const MenuItem = ({ icon, title, onPress, color }: any) => {
   );
 };
 
-const makeStyles = (colors: any) => StyleSheet.create({
+const makeStyles = (colors: Theme['colors']) => StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: colors.background,
   },
   scrollContainer: {
-    paddingHorizontal: 20,
-    paddingTop: 20,
+    // paddingHorizontal: 20
+  },
+  profileBackground: {
+    backgroundColor: colors.primary,
+    padding: 20,
+    borderBottomStartRadius: 16,
+    borderBottomEndRadius: 16,
+    elevation: 5,
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.2,
+    shadowRadius: 4,
   },
   profileHeader: {
-    padding: 20,
     flexDirection: 'row',
     alignItems: 'center',
-    paddingBottom: 25,
-    marginBottom: 20,
-    borderBottomWidth: 1,
-    borderBottomColor: colors.border,
+    padding: 20,
+    backgroundColor: colors.secondaryBackground,
+    borderRadius: 16,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 3,
   },
   avatarContainer: {
+    position: 'relative',
     backgroundColor: colors.primary,
     borderRadius: 50,
-    width: 60,
-    height: 60,
+    width: 70,
+    height: 70,
     justifyContent: 'center',
     alignItems: 'center',
     marginRight: 20,
@@ -182,11 +214,21 @@ const makeStyles = (colors: any) => StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
   },
+  editIcon: {
+    position: 'absolute',
+    bottom: 0,
+    right: 0,
+    backgroundColor: colors.background,
+    borderRadius: 12,
+    padding: 4,
+    borderWidth: 2,
+    borderColor: colors.primary,
+  },
   profileDetails: {
     flex: 1,
   },
   userName: {
-    fontSize: 20,
+    fontSize: 22,
     fontWeight: '600',
     color: colors.textPrimary,
     marginBottom: 4,
@@ -198,7 +240,7 @@ const makeStyles = (colors: any) => StyleSheet.create({
   },
   section: {
     marginBottom: 25,
-    backgroundColor: colors.card,
+    backgroundColor: colors.background,
     borderRadius: 12,
     padding: 15,
   },
@@ -210,7 +252,7 @@ const makeStyles = (colors: any) => StyleSheet.create({
   },
   authButton: {
     borderWidth: 1,
-    borderColor: colors.border,
+    borderColor: colors.pureBlack,
     paddingVertical: 12,
     borderRadius: 8,
     alignItems: 'center',

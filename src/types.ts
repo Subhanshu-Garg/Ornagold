@@ -37,12 +37,20 @@ export type SignUpParams =
   | { method: 'email'; email: string; password: string; displayName: string }
   | { method: 'phone'; phone: string; code?: string; password: string; displayName: string };
 
+export interface UpdateProfileParams {
+  name: string;
+  phone?: string;
+}
+
 export interface AuthContextType {
   user: User | null;
   loading: boolean;
   signIn: (params: SignInParams) => Promise<void>;
   signUp: (params: SignUpParams) => Promise<void>;
   signOut: () => Promise<void>;
+  updateProfile: (params: UpdateProfileParams) => Promise<void>;
+  sendOTP: (phone: string) => Promise<void>;
+  verifyOTP: (phone: string, token: string) => Promise<void>;
   authError: AuthError | null;
 }
 

@@ -18,6 +18,9 @@ export const handleContactPress = async (phoneNum: string | void) => {
   };
 
 export const sanitizePhoneNum = (phoneNum: string) => {
+  if(!validatePhoneNumber(phoneNum)) {
+    return null
+  }
   // Remove all non-digit characters except potential leading +
   const cleaned = phoneNum.replace(/[^\d+]/g, '');
   
@@ -29,4 +32,12 @@ export const sanitizePhoneNum = (phoneNum: string) => {
   
   // Remove any remaining non-digit characters for local numbers
   return cleaned.replace(/\D/g, '');
+};
+
+export const validatePhoneNumber = (phone: string): boolean => {
+  // Remove all non-digit characters
+  const cleaned = phone.replace(/\D/g, '');
+  
+  // Check if the cleaned number has exactly 10 digits
+  return /^\d{10}$/.test(cleaned);
 };

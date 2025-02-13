@@ -14,6 +14,7 @@ import { RouteProp } from "@react-navigation/native";
 import { RootStackParamList, Shop, TabStackParamList } from "../types";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { SafeAreaView } from 'react-native-safe-area-context';
+import useStatusBarColor from '../hooks/useStatusBarColor';
 
 type DiscoverScreenProps = {
   route: RouteProp<TabStackParamList, "Discover">;
@@ -27,6 +28,9 @@ export default function DiscoverScreen({
   const { theme } = useTheme();
   const styles = makeStyles(theme.colors);
   const [searchVal, setSearchVal] = useState("");
+
+  // Use the hook without header color
+  useStatusBarColor(theme.colors.primary);
 
   const handleSearchSubmit = async () => {
     if (!searchVal) {

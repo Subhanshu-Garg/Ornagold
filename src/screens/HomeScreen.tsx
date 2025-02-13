@@ -20,6 +20,7 @@ import ShopListContainer from '../components/ShopListContainer';
 import ReachOutSection from '../components/ReachOutSection';
 import PartnerLogos from '../components/PartnerLogos';
 import MetricCards from '../components/MetricCards';
+import useStatusBarColor from '../hooks/useStatusBarColor';
 // import { SafeAreaView } from 'react-native-safe-area-context';
 
 type HomeScreenProps = {
@@ -64,6 +65,9 @@ export default function HomeScreen({ navigation }: HomeScreenProps) {
   const flatListRef = useRef<FlatList>(null);
 
   const styles = makeStyles(theme.colors)
+
+  // Use the hook with header color
+  useStatusBarColor(theme.colors.secondaryBackground);
 
   useEffect(() => {
     (async () => {

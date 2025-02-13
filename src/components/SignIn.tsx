@@ -51,6 +51,7 @@ export default function SignIn({ navigation }: SignInProps) {
       await signIn({ method: 'otp', phone, code: otp });
       navigation.goBack();
     } catch (error) {
+      console.error('Error while verifying otp', error)
       setError(error instanceof Error ? error.message : "Failed to verify OTP");
     }
   };

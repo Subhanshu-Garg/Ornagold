@@ -2,10 +2,13 @@ import React from 'react';
 import { View, Text, ScrollView, StyleSheet } from 'react-native';
 import { useTheme } from '../contexts/ThemeContext';
 import { Theme } from '../constants/Theme';
+import useStatusBarColor from '../hooks/useStatusBarColor';
 
 export default function FAQsScreen() {
   const { theme } = useTheme();
   const styles = makeStyles(theme.colors);
+
+  useStatusBarColor(theme.colors.secondaryBackground)
 
   return (
     <ScrollView contentContainerStyle={styles.container}>

@@ -1,7 +1,7 @@
 import React, { createContext, useContext, useEffect, useState, useMemo } from 'react';
 import { AuthError, Session, User } from '@supabase/supabase-js';
 import { supabase } from '../lib/supabase';
-import { AuthContextType, SignInParams, SignUpParams } from '../types';
+import { AuthContextType, SignInParams, SignUpParams, UpdateProfileParams } from '../types';
 
 const AuthContext = createContext<AuthContextType>({} as AuthContextType);
 
@@ -97,7 +97,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       else if (params.method === 'phone') {
         if (params.code) {
           const { error } = await supabase.auth.verifyOtp({
-            phone: params.phone,
+            phone: `+91${params.phone}`,
             token: params.code,
             type: 'sms'
           });
@@ -139,13 +139,62 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     }
   };
 
+  const updateProfile = async (profile: UpdateProfileParams) => {
+    try {
+      const updateObj: any = {}
+      if(profile.phone) {
+        updateObj.phone = profile.phone
+      }
+      updateObj.data = {
+        displayName: profile.name
+      }
+      const { error } = await supabase.auth.updateUser(updateObj);
+
+      if (error) throw error;
+    } catch (error) {
+      console.error('Error updating profile:', error);
+      throw error;
+    }
+  };
+
+  const sendOTP = async (phone: string) => {
+    try {
+      const { error } = await supabase.auth.signInWithOtp({
+        phone: `+91${phone}`,
+      });
+
+      if (error) throw error;
+    } catch (error) {
+      console.error('Error sending OTP:', error);
+      throw error;
+    }
+  };
+
+  const verifyOTP = async (phone: string, token: string) => {
+    try {
+      const { error } = await supabase.auth.verifyOtp({
+        phone: `+91${phone}`,
+        token,
+        type: 'sms',
+      });
+
+      if (error) throw error;
+    } catch (error) {
+      console.error('Error verifying OTP:', error);
+      throw error;
+    }
+  };
+
   const value = useMemo(() => ({
     user,
     loading,
     signIn,
     signUp,
     signOut,
-    authError
+    authError,
+    updateProfile,
+    sendOTP,
+    verifyOTP,
   }), [user, loading, authError]);
 
   return (
