@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, ScrollView } from 'react-native';
 import { useAuth } from '../contexts/AuthContext';
 import { useTheme } from '../contexts/ThemeContext';
@@ -6,11 +6,13 @@ import { Icon } from 'react-native-elements';
 import { Share } from 'react-native';
 import { handleContactPress } from '../helpers';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
-import type { RootStackParamList } from '../types';
+import type { RootStackParamList, Shop } from '../types';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import EditProfileModal from '../components/EditProfileModal';
 import { Theme } from '../constants/Theme';
 import useStatusBarColor from '../hooks/useStatusBarColor';
+import { errorHandler } from '../utils/errorHandler';
+import { getMyShops } from '../services/shops';
 
 type ProfileScreenNavigationProp = NativeStackNavigationProp<RootStackParamList>;
 
@@ -22,9 +24,31 @@ export default function ProfileScreen({ navigation }: ProfileScreenProps) {
   const { user, signOut } = useAuth();
   const { theme } = useTheme();
   const styles = makeStyles(theme.colors);
-  const isShopOwner = true
+  const [myShops, setMyShops] = useState<Shop[]>([]);
+  const [isLoadingShops, setIsLoadingShops] = useState(true);
+  const isShopOwner = true || myShops.length > 0;
   const [isEditModalVisible, setEditModalVisible] = useState(false);
   useStatusBarColor(theme.colors.primary)
+
+  useEffect(() => {
+    const loadShops = async () => {
+      if (!user?.id) {
+        setIsLoadingShops(false);
+        return;
+      }
+
+      try {
+        const shops = await getMyShops(user.id);
+        setMyShops(shops);
+      } catch (error) {
+        errorHandler.handle(error, 'shop_ownership');
+      } finally {
+        setIsLoadingShops(false);
+      }
+    };
+
+    loadShops();
+  }, [user?.id]);
 
   const handleAuth = async () => {
     if (user) {
@@ -75,14 +99,6 @@ export default function ProfileScreen({ navigation }: ProfileScreenProps) {
               })}
             />
             <MenuItem
-              icon="add-business"
-              title="Create New Shop"
-              color={theme.colors.primary}
-              onPress={() => navigation.navigate('ShopProfile', { 
-                createNew: true 
-              })}
-            />
-            <MenuItem
               icon="analytics"
               title="Shop Analytics"
               color={theme.colors.primary}
@@ -96,6 +112,17 @@ export default function ProfileScreen({ navigation }: ProfileScreenProps) {
             />
           </View>
         )}
+
+        {/* Always show Create New Shop */}
+        <View style={styles.section}>
+          <Text style={styles.sectionTitle}>Shop Management</Text>
+          <MenuItem
+            icon="add-business"
+            title="Create New Shop"
+            color={theme.colors.primary}
+            onPress={() => navigation.navigate('CreateShop')}
+          />
+        </View>
 
         {/* General Features */}
         <View style={styles.section}>
@@ -184,6 +211,7 @@ const makeStyles = (colors: Theme['colors']) => StyleSheet.create({
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.2,
     shadowRadius: 4,
+    marginBottom: 10
   },
   profileHeader: {
     flexDirection: 'row',

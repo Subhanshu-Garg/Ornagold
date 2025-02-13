@@ -13,3 +13,5 @@ export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
     detectSessionInUrl: false,
   },
 });
+
+export const supabaseStorageUrl = `${process.env.EXPO_PUBLIC_SUPABASE_URL}/storage/v1/object/public`;

@@ -27,6 +27,7 @@ import ShopProfileScreen from './src/screens/ShopProfileScreen';
 import PrivacyPolicyScreen from './src/screens/PrivacyPolicyScreen';
 import * as Updates from 'expo-updates';
 import Constants from 'expo-constants';
+import CreateShopScreen from './src/screens/CreateShopScreen';
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
 const Tab = createBottomTabNavigator<TabStackParamList>();
@@ -110,7 +111,19 @@ function Navigation() {
             <Stack.Screen 
               name="ShopProfile" 
               component={ShopProfileScreen}
-              options={{ title: 'Shop Profile', headerShown: false }}
+              options={{ title: 'Manage Shop', headerShown: false }}
+            />
+            <Stack.Screen 
+              name="CreateShop" 
+              component={CreateShopScreen}
+              options={{ 
+               title: 'Create Shop', 
+               headerStyle: {
+                backgroundColor: theme.colors.secondaryBackground
+               },
+               headerTintColor: theme.colors.textPrimary,
+               headerShown: true
+              }}
             />
         </Stack.Navigator>
       </NavigationContainer>

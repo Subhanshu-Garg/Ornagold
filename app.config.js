@@ -81,6 +81,12 @@ export default {
           "locationAlwaysAndWhenInUsePermission": "Allow $(PRODUCT_NAME) to use your location."
         }
       ],
+      [
+        "expo-image-picker",
+        {
+          "photosPermission": "The app accesses your photos for your shop."
+        }
+      ],
       "expo-updates"
     ],
     "experiments": {

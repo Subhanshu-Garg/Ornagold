@@ -11,7 +11,6 @@ export interface Shop {
   longitude: number;
   address: string;
   logoImage: string;
-  google_map_link: string;
   gallery: string[];
 }
 
@@ -75,8 +74,9 @@ export type RootStackParamList = {
   FAQs: undefined;
   PrivacyPolicy: undefined;
   Settings: undefined;
-  ShopProfile: { createNew?: boolean };
   Inventory: undefined;
+  ShopProfile: { createNew?: boolean; shopId?: string };
+  CreateShop: undefined;
   ShopAnalytics: undefined;
 };
 

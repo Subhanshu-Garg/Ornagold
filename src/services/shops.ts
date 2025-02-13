@@ -1,7 +1,9 @@
 import { useAuth } from '../contexts/AuthContext';
-import { supabase } from '../lib/supabase'; // Assuming you have supabase initialized
+import { supabase, supabaseStorageUrl } from '../lib/supabase'; // Assuming you have supabase initialized
 import { RootStackParamList, Shop } from '../types';
 import { errorHandler } from '../utils/errorHandler';
+import * as FileSystem from 'expo-file-system';
+import { Buffer } from 'buffer';
 
 export const getShops = async (
   searchQuery?: string,
@@ -50,9 +52,10 @@ export const createShop = async (shopData: Partial<Shop>): Promise<Shop> => {
   const { data, error } = await supabase
     .from('shops')
     .insert([shopData])
+    .select()
     .single();
 
-  if (error || !data) throw errorHandler.handle(error);
+  if (error) throw errorHandler.handle(error);
 
   const shop = data as Shop
   // Add owner to shop_owners table
@@ -62,9 +65,8 @@ export const createShop = async (shopData: Partial<Shop>): Promise<Shop> => {
       shopId: shop.id, 
       userId: user.id 
     }]);
-
+  
   if (ownerError) throw errorHandler.handle(ownerError);
-
   return shop;
 };
 
@@ -79,16 +81,56 @@ export const updateShop = async (shopId: string, updates: Partial<Shop>): Promis
   return data as Shop;
 };
 
-export const getMyShops = async (): Promise<Shop[]> => {
-  const { data: { user } } = await supabase.auth.getUser();
-  if (!user) throw new Error('Not authenticated');
+export const getMyShops = async (userId?: String): Promise<Shop[]> => {
+  if(!userId) {
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) throw new Error('Not authenticated');
+    userId = user.id
+  }
 
   const { data, error } = await supabase
     .from('shop_owners')
     .select('shops(*)')
-    .eq('userId', user.id);
+    .eq('userId', userId);
 
   if (error) return [];
   return (data?.map(owner => owner.shops) || []) as unknown as Shop[];
+};
+
+export const uploadFile = async (localUri: string) => {
+  try {
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) throw new Error('User not authenticated');
+
+    const fileName = `shop-logo-${Date.now()}`;
+    const fileType = localUri.split('/').pop()?.split('.').pop() || 'jpeg';
+    const filePath = `${user.id}/${fileName}`;
+
+    const fileData = await FileSystem.readAsStringAsync(localUri, {
+      encoding: FileSystem.EncodingType.Base64,
+    });
+
+    const { data, error } = await supabase.storage
+      .from('shop-logos')
+      .upload(filePath, decode(fileData), {
+        contentType: `image/${fileType}`,
+        upsert: false,
+      });
+
+    if (error) throw error;
+    return { 
+      path: data.path, 
+      url: `${supabaseStorageUrl}/shop-logos/${data.path}`
+    };
+  } catch (error) {
+    throw errorHandler.handle(error, 'file_upload');
+  }
+};
+
+// Add this utility function
+const decode = (base64: string) => {
+  const bs64 = base64.replace(/^data:image\/\w+;base64,/, '');
+  const buffer = Buffer.from(bs64, 'base64');
+  return buffer;
 };
 
