@@ -13,6 +13,7 @@ import { Theme } from "../constants/Theme";
 import { RouteProp } from "@react-navigation/native";
 import { RootStackParamList, Shop, TabStackParamList } from "../types";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 type DiscoverScreenProps = {
   route: RouteProp<TabStackParamList, "Discover">;
@@ -43,58 +44,60 @@ export default function DiscoverScreen({
   }
 
   return (
-    <ScrollView contentContainerStyle={styles.container} keyboardShouldPersistTaps='handled'>
-      <View style={styles.heroSection}>
-        <Text style={styles.heading}>Discover the Best Gold Prices</Text>
-        <Text style={styles.subtitle}>
-          Compare, locate, and get the best deals from trusted shops near you.
-        </Text>
+    <SafeAreaView edges={['top']} style={styles.container}>
+      <ScrollView contentContainerStyle={styles.scrollContainer} keyboardShouldPersistTaps='handled'>
+        <View style={styles.heroSection}>
+          <Text style={styles.heading}>Discover the Best Gold Prices</Text>
+          <Text style={styles.subtitle}>
+            Compare, locate, and get the best deals from trusted shops near you.
+          </Text>
 
-        <SearchBar
-          value={searchVal}
-          onChangeText={(text) => setSearchVal(text)}
-          onSubmit={handleSearchSubmit}
-        />
-
-        <TouchableOpacity
-          style={styles.ctaButton}
-          onPress={handleSearchSubmit}
-        >
-          <Text style={styles.ctaText}>Find Best Deals</Text>
-          <Icon
-            name="arrow-forward"
-            color={theme.colors.darkGray}
-            size={22}
+          <SearchBar
+            value={searchVal}
+            onChangeText={(text) => setSearchVal(text)}
+            onSubmit={handleSearchSubmit}
           />
-        </TouchableOpacity>
-      </View>
 
-      <View style={styles.featuresContainer}>
-        <View style={styles.featureCard}>
-          <Icon name="timeline" size={30} color={theme.colors.primary} />
-          <Text style={styles.featureTitle}>Real-time Prices</Text>
-          <Text style={styles.featureText}>
-            Get up-to-date gold prices from shops in your area
-          </Text>
+          <TouchableOpacity
+            style={styles.ctaButton}
+            onPress={handleSearchSubmit}
+          >
+            <Text style={styles.ctaText}>Find Best Deals</Text>
+            <Icon
+              name="arrow-forward"
+              color={theme.colors.darkGray}
+              size={22}
+            />
+          </TouchableOpacity>
         </View>
 
-        <View style={styles.featureCard}>
-          <Icon name="location-on" size={30} color={theme.colors.primary} />
-          <Text style={styles.featureTitle}>Shop Locator</Text>
-          <Text style={styles.featureText}>
-            Find trusted gold shops near you with detailed directions
-          </Text>
-        </View>
+        <View style={styles.featuresContainer}>
+          <View style={styles.featureCard}>
+            <Icon name="timeline" size={30} color={theme.colors.primary} />
+            <Text style={styles.featureTitle}>Real-time Prices</Text>
+            <Text style={styles.featureText}>
+              Get up-to-date gold prices from shops in your area
+            </Text>
+          </View>
 
-        <View style={styles.featureCard}>
-          <Icon name="verified-user" size={30} color={theme.colors.primary} />
-          <Text style={styles.featureTitle}>Verified Reviews</Text>
-          <Text style={styles.featureText}>
-            Read authentic reviews from verified customers
-          </Text>
+          <View style={styles.featureCard}>
+            <Icon name="location-on" size={30} color={theme.colors.primary} />
+            <Text style={styles.featureTitle}>Shop Locator</Text>
+            <Text style={styles.featureText}>
+              Find trusted gold shops near you with detailed directions
+            </Text>
+          </View>
+
+          <View style={styles.featureCard}>
+            <Icon name="verified-user" size={30} color={theme.colors.primary} />
+            <Text style={styles.featureTitle}>Verified Reviews</Text>
+            <Text style={styles.featureText}>
+              Read authentic reviews from verified customers
+            </Text>
+          </View>
         </View>
-      </View>
-    </ScrollView>
+      </ScrollView>
+    </SafeAreaView>
   );
 }
 
@@ -106,13 +109,20 @@ const makeStyles = (colors: Theme["colors"]) =>
       alignItems: "center",
       backgroundColor: colors.background,
     },
+    scrollContainer: {
+      // padding: 20,
+      // paddingTop: 80,
+      alignItems: "center",
+      backgroundColor: colors.background,
+    },
     heroSection: {
       width: "100%",
       alignItems: "center",
       padding: 20,
-      paddingTop: 80,
+      paddingTop: 30,
       backgroundColor: colors.primary,
-      borderRadius: 16,
+      borderBottomStartRadius: 16,
+      borderBottomEndRadius: 16,
       elevation: 5,
       shadowColor: "#000",
       shadowOffset: { width: 0, height: 2 },

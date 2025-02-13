@@ -122,7 +122,7 @@ const makeStyles = (colors: Theme['colors']) => StyleSheet.create({
   },
   verticalList: {
     paddingHorizontal: 0,
-    paddingBottom: 100
+    paddingBottom: 20
   },
   shopItem: {
     backgroundColor: colors.secondaryBackground,

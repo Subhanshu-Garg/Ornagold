@@ -5,8 +5,8 @@ export interface Shop {
   name: string;
   locality: string;
   phone: string;
-  makingCharges: number;
-  goldRate: number;
+  makingCharges: string;
+  goldRate: string;
   latitude: number;
   longitude: number;
   address: string;
@@ -67,7 +67,9 @@ export type RootStackParamList = {
   FAQs: undefined;
   PrivacyPolicy: undefined;
   Settings: undefined;
-  ShopProfile: undefined;
+  ShopProfile: { createNew?: boolean };
+  Inventory: undefined;
+  ShopAnalytics: undefined;
 };
 
 export type TabStackParamList = {
@@ -78,6 +80,7 @@ export type TabStackParamList = {
 };
 
 export type Banner = {
+  key?: number,
   bannerTitle: string,
   bannerText: string,
   ctaText: string,

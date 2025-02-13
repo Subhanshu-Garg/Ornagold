@@ -11,7 +11,7 @@ import {
 import { useTheme } from "../contexts/ThemeContext";
 import { LinearGradient } from "expo-linear-gradient";
 import { Theme } from "../constants/Theme";
-import Carousel from "react-native-reanimated-carousel";
+import Carousel from "pinar";
 import { Icon } from "@rneui/themed";
 import { Banner } from "../types";
 
@@ -41,11 +41,10 @@ const BannerCarousel = ({
   headerColor,
 }: Props) => {
   const { theme } = useTheme();
-  const flatListRef = useRef<FlatList>(null);
   const styles = makeStyles(theme.colors);
 
   const renderBannerItem = ({ item }: { item: Banner }) => (
-    <View style={styles.bannerItem}>
+    <View key={item.key} style={styles.bannerItem}>
       <Image
         source={{ uri: item.uri }}
         style={styles.bannerImage}
@@ -80,22 +79,24 @@ const BannerCarousel = ({
       </LinearGradient>
     </View>
   );
+
   const width = Dimensions.get("window").width;
   return (
     <View style={{ flex: 1 }}>
       <Carousel
+        autoplay
+        showsControls={false}
         loop
         width={width}
         height={width}
-        autoPlay={true}
-        autoPlayInterval={3000}
-        scrollAnimationDuration={3000}
-        data={banners}
-        renderItem={renderBannerItem}
-        panGestureHandlerProps={{
-          activeOffsetX: [-100, 100],
-        }}
-      />
+        dotStyle={styles.dot}
+        activeDotStyle={styles.activeDot}
+      >
+        {banners.map((item, index) => {
+          item.key = index
+          return renderBannerItem({ item })
+        })}
+      </Carousel>
     </View>
   );
 };
@@ -187,6 +188,10 @@ const makeStyles = (colors: Theme["colors"]) =>
       marginHorizontal: 4,
     },
     activeDot: {
+      width: 8,
+      height: 8,
+      borderRadius: 4,
       backgroundColor: colors.primary,
+      marginHorizontal: 4,
     },
   });

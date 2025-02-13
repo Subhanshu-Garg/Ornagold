@@ -93,7 +93,7 @@ const makeStyles = (colors: Theme['colors']) => StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: colors.background,
-    marginTop: 15,
-    marginLeft: 15
+    paddingTop: 15,
+    paddingLeft: 15
   },
 }); 

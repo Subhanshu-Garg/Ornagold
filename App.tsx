@@ -16,7 +16,7 @@ import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { Icon } from '@rneui/themed';
 import FavoritesScreen from './src/screens/FavoritesScreen';
 import { HeaderColorProvider, useHeaderColor } from './src/contexts/HeaderColorContext';
-import { View, Text, Image, StyleSheet, TouchableOpacity } from 'react-native';
+import { View, Text, Image, StyleSheet, TouchableOpacity, StatusBar, Platform } from 'react-native';
 import { Colors } from './src/constants/Colors';
 import { Theme } from './src/constants/Theme';
 import ShopListScreen from './src/screens/ShopListScreen';
@@ -37,23 +37,15 @@ SplashScreen.preventAutoHideAsync();
 function Navigation() {
   const { theme } = useTheme();
   return (
-    <HeaderColorProvider>
-      <NavigationContainer
-        theme={{
-          ...DefaultTheme,
-          dark: theme.mode === 'dark',
-          colors: {
-            ...DefaultTheme.colors,
-            ...theme.colors,
-          },
-        }}
+    <NavigationContainer
         onReady={() => SplashScreen.hideAsync()}
       >
-        <Stack.Navigator
-          screenOptions={{
-            headerShown: false
-          }}
-        >
+        <Stack.Navigator screenOptions={{
+          headerShown: false,
+          statusBarAnimation: 'fade',
+          statusBarBackgroundColor: theme.colors.secondaryBackground,
+          statusBarStyle: theme.mode === 'dark' ? 'light' : 'dark'
+        }}>
           <Stack.Screen name="MainTabs" component={TabNavigator} />
           <Stack.Screen 
             name="Auth" 
@@ -91,11 +83,12 @@ function Navigation() {
               name="FAQs" 
               component={FAQsScreen}
               options={{ title: 'FAQs & Support', 
-              headerStyle: {
-                backgroundColor: theme.colors.secondaryBackground
-              },
-              headerTintColor: theme.colors.textPrimary,
-              headerShown: true }}
+                headerStyle: {
+                  backgroundColor: theme.colors.secondaryBackground
+                },
+                headerTintColor: theme.colors.textPrimary,
+                headerShown: true
+              }}
             />
             <Stack.Screen 
               name="PrivacyPolicy" 
@@ -106,7 +99,8 @@ function Navigation() {
                   backgroundColor: theme.colors.secondaryBackground
                 },
                 headerTintColor: theme.colors.textPrimary,
-                headerShown: true }}
+                headerShown: true
+              }}
             />
             {/* <Stack.Screen 
               name="Settings" 
@@ -116,11 +110,10 @@ function Navigation() {
             <Stack.Screen 
               name="ShopProfile" 
               component={ShopProfileScreen}
-              options={{ title: 'Shop Profile' }}
+              options={{ title: 'Shop Profile', headerShown: false }}
             />
         </Stack.Navigator>
       </NavigationContainer>
-    </HeaderColorProvider>
   );
 }
 
@@ -145,7 +138,11 @@ function TabNavigator() {
           backgroundColor: theme.colors.background,
           borderTopColor: theme.colors.primary,
         },
-        headerShown: false
+        headerShown: false,
+        contentStyle: {
+          flex: 1,
+          backgroundColor: theme.colors.background
+        }
       })}
     >
       <Tab.Screen name="Home" component={HomeScreen} options={{

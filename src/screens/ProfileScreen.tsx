@@ -5,12 +5,21 @@ import { useTheme } from '../contexts/ThemeContext';
 import { Icon } from 'react-native-elements';
 import { Share } from 'react-native';
 import { handleContactPress } from '../helpers';
+import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import type { RootStackParamList } from '../types';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
-export default function ProfileScreen({ navigation }: any) {
+type ProfileScreenNavigationProp = NativeStackNavigationProp<RootStackParamList>;
+
+type ProfileScreenProps = {
+  navigation: ProfileScreenNavigationProp;
+};
+
+export default function ProfileScreen({ navigation }: ProfileScreenProps) {
   const { user, signOut } = useAuth();
   const { theme } = useTheme();
   const styles = makeStyles(theme.colors);
-  const isShopOwner = user?.role === 'shop_owner';
+  const isShopOwner = true
 
   const handleAuth = async () => {
     if (user) {
@@ -21,7 +30,7 @@ export default function ProfileScreen({ navigation }: any) {
   };
 
   return (
-    <View style={styles.container}>
+    <SafeAreaView style={styles.container}>
       <ScrollView contentContainerStyle={styles.scrollContainer}>
         {/* Profile Header */}
         <View style={styles.profileHeader}>
@@ -46,9 +55,19 @@ export default function ProfileScreen({ navigation }: any) {
             <Text style={styles.sectionTitle}>Business Tools</Text>
             <MenuItem
               icon="store"
-              title="My Shop Profile"
+              title="My Shops"
               color={theme.colors.primary}
-              onPress={() => navigation.navigate('ShopProfile')}
+              onPress={() => navigation.navigate('ShopProfile', {
+                createNew: false
+              })}
+            />
+            <MenuItem
+              icon="add-business"
+              title="Create New Shop"
+              color={theme.colors.primary}
+              onPress={() => navigation.navigate('ShopProfile', { 
+                createNew: true 
+              })}
             />
             <MenuItem
               icon="analytics"
@@ -113,7 +132,7 @@ export default function ProfileScreen({ navigation }: any) {
           </TouchableOpacity>
         </View>
       </ScrollView>
-    </View>
+    </SafeAreaView>
   );
 }
 
@@ -139,7 +158,6 @@ const makeStyles = (colors: any) => StyleSheet.create({
     paddingTop: 20,
   },
   profileHeader: {
-    paddingTop: 50,
     padding: 20,
     flexDirection: 'row',
     alignItems: 'center',
