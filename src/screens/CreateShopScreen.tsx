@@ -10,37 +10,50 @@ import {
   Image,
 } from "react-native";
 import { useTheme } from "../contexts/ThemeContext";
-import { createShop, uploadFile } from "../services/shops";
+import { uploadFile } from "../services/shops";
 import { errorHandler } from "../utils/errorHandler";
 import { useAuth } from "../contexts/AuthContext";
-import { Shop } from "../types";
-import { useNavigation } from "@react-navigation/native";
+import { RootStackParamList, Shop } from "../types";
+import { RouteProp, useNavigation } from "@react-navigation/native";
 import { Icon } from "react-native-elements";
 import * as Location from "expo-location";
 import { SafeAreaView } from "react-native-safe-area-context";
 import * as ImagePicker from 'expo-image-picker';
 import * as FileSystem from 'expo-file-system';
+import { NativeStackNavigationProp } from "@react-navigation/native-stack";
+import { Theme } from "../constants/Theme";
 
-export default function CreateShopScreen() {
+
+type CreateShopScreenProps = {
+  route: RouteProp<RootStackParamList, "CreateShop">;
+  navigation: NativeStackNavigationProp<RootStackParamList, "CreateShop">;
+};
+
+export default function CreateShopScreen({ route }: CreateShopScreenProps) {
+  const { title } = route.params
+  
   const { theme } = useTheme();
-  const { user } = useAuth();
+  const { user, createMyShop, updateMyShop } = useAuth();
   const styles = makeStyles(theme.colors);
   const navigation = useNavigation();
-  const [shop, setShop] = useState<Partial<Shop>>({
+
+  const initialShop: Shop = title === 'Update Shop' ? route.params.shop : {
+    id: "",
     name: "",
     address: "",
-    phone: "",
+    phone: `+${user?.phone}`,
     locality: "",
     goldRate: "",
     makingCharges: "",
     latitude: 0,
     longitude: 0,
     logoImage: "",
-  });
+    gallery: []
+  }
+  const [shop, setShop] = useState<Shop>(initialShop);
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [hasLocation, setHasLocation] = useState(false);
-  const [uploading, setUploading] = useState(false);
+  const [hasLocation, setHasLocation] = useState(Boolean(shop.latitude && shop.longitude));
 
   const validateForm = () => {
     const newErrors: Record<string, string> = {};
@@ -154,12 +167,18 @@ export default function CreateShopScreen() {
         logoUrl = uploadResponse.url;
       }
 
-      const newShop = await createShop({ 
-        ...shop,
-        logoImage: logoUrl
-      });
-      
-      Alert.alert("Success", "Shop created successfully");
+      if(title === 'Create Shop') {
+        createMyShop({
+          ...shop,
+          logoImage: logoUrl
+        })
+      } else {
+        updateMyShop(shop.id, {
+          ...shop,
+          logoImage: logoUrl
+        })
+      }
+
       navigation.goBack();
     } catch (error) {
       errorHandler.handle(error, "shop_creation");
@@ -191,6 +210,7 @@ export default function CreateShopScreen() {
             value={shop.phone}
             onChangeText={(text) => setShop({ ...shop, phone: text })}
             keyboardType="phone-pad"
+            editable={false}
             placeholder="e.g. 9876543210"
           />
           {errors.phone && <Text style={styles.errorText}>{errors.phone}</Text>}
@@ -284,7 +304,6 @@ export default function CreateShopScreen() {
         <TouchableOpacity 
           style={styles.uploadButton}
           onPress={handleImageUpload}
-          disabled={uploading}
         >
           {shop.logoImage ? (
             <Image 
@@ -313,7 +332,7 @@ export default function CreateShopScreen() {
         disabled={isSubmitting}
       >
         <Text style={styles.submitButtonText}>
-          {isSubmitting ? "Creating..." : "Create Shop"}
+          {isSubmitting ? "Loading..." : title}
         </Text>
       </TouchableOpacity>
     </ScrollView>
@@ -321,7 +340,7 @@ export default function CreateShopScreen() {
 }
 
 // Reuse the makeStyles from ShopProfileScreen
-const makeStyles = (colors: any) =>
+const makeStyles = (colors: Theme['colors']) =>
   StyleSheet.create({
     container: {
       padding: 20,
@@ -384,7 +403,7 @@ const makeStyles = (colors: any) =>
       borderRadius: 8,
       fontSize: 16,
       borderWidth: 1,
-      borderColor: colors.border,
+      borderColor: colors.textPrimary,
     },
     errorInput: {
       borderColor: colors.error,
@@ -410,7 +429,7 @@ const makeStyles = (colors: any) =>
       borderRadius: 8,
       marginBottom: 20,
       borderWidth: 1,
-      borderColor: colors.border,
+      borderColor: colors.textPrimary,
     },
     locationButtonText: {
       color: colors.textPrimary,
@@ -460,7 +479,7 @@ const makeStyles = (colors: any) =>
       backgroundColor: colors.background,
       borderRadius: 12,
       borderWidth: 2,
-      borderColor: colors.border,
+      borderColor: colors.textPrimary,
       justifyContent: 'center',
       alignItems: 'center',
       overflow: 'hidden',

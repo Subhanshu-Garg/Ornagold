@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect, useCallback } from 'react';
+import React, { useState, useRef, useEffect, useCallback } from "react";
 import {
   StyleSheet,
   View,
@@ -9,47 +9,49 @@ import {
   Keyboard,
   Button,
   Linking,
-} from 'react-native';
-import { RouteProp } from '@react-navigation/native';
-import { NativeStackNavigationProp } from '@react-navigation/native-stack';
-import MapView, { Marker } from 'react-native-maps';
-import { Review, RootStackParamList, Shop } from '../types';
-import { colors, Icon } from 'react-native-elements';
-import useProtectedAction from '../hooks/useProtectedAction';
-import { getShopReviews, submitShopReview } from '../services/reviews';
-import { errorHandler } from '../utils/errorHandler';
-import { User } from '@supabase/supabase-js';
-import { useAuth } from '../contexts/AuthContext';
-import useAsync from '../hooks/useAsync';
-import LoadingSpinner from '../components/LoadingSpinner';
-import { useTheme } from '../contexts/ThemeContext';
-import { Theme } from '../constants/Theme';
-import { handleContactPress } from '../helpers';
-import useStatusBarColor from '../hooks/useStatusBarColor';
+} from "react-native";
+import { RouteProp } from "@react-navigation/native";
+import { NativeStackNavigationProp } from "@react-navigation/native-stack";
+import MapView, { Marker } from "react-native-maps";
+import { Review, RootStackParamList, Shop } from "../types";
+import { colors, Icon } from "react-native-elements";
+import useProtectedAction from "../hooks/useProtectedAction";
+import { getShopReviews, submitShopReview } from "../services/reviews";
+import { errorHandler } from "../utils/errorHandler";
+import { User } from "@supabase/supabase-js";
+import { useAuth } from "../contexts/AuthContext";
+import useAsync from "../hooks/useAsync";
+import LoadingSpinner from "../components/LoadingSpinner";
+import { useTheme } from "../contexts/ThemeContext";
+import { Theme } from "../constants/Theme";
+import { handleContactPress } from "../helpers";
+import useStatusBarColor from "../hooks/useStatusBarColor";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 type ShopScreenProps = {
-  route: RouteProp<RootStackParamList, 'Shop'>;
-  navigation: NativeStackNavigationProp<RootStackParamList, 'Shop'>;
+  route: RouteProp<RootStackParamList, "Shop">;
+  navigation: NativeStackNavigationProp<RootStackParamList, "Shop">;
 };
 
 export default function ShopScreen({ route, navigation }: ShopScreenProps) {
   const { shop: initialShop } = route.params;
   const [shop, setShop] = useState<Shop>(initialShop);
-  const [newReview, setNewReview] = useState('');
+  const [newReview, setNewReview] = useState("");
   const [rating, setRating] = useState(0);
-  const [submitReviewWarning, setSubmitReviewWarning] = useState('');
-  const { user } = useAuth();
+  const [submitReviewWarning, setSubmitReviewWarning] = useState("");
+  const { user, myShops } = useAuth();
   const protectedAction = useProtectedAction();
   const { theme } = useTheme();
 
-  const styles = makeStyles(theme.colors)
-  useStatusBarColor(theme.colors.primary)
+  const styles = makeStyles(theme.colors);
+  useStatusBarColor(theme.colors.primary);
 
+  const isMyShop = myShops.some((myShop) => myShop.id === shop.id);
   // Using the updated hook with automatic execution
   const {
     data: reviews,
     isLoading: isLoadingReviews,
-    execute: fetchReviews
+    execute: fetchReviews,
   } = useAsync<Review[]>(
     () => getShopReviews(shop.id),
     [shop.id] // Dependency array - will re-run when shop.id changes
@@ -57,15 +59,15 @@ export default function ShopScreen({ route, navigation }: ShopScreenProps) {
 
   const handleSubmitReview = async () => {
     Keyboard.dismiss();
-    setSubmitReviewWarning('');
-    
-    if (newReview.trim() === '') {
-      setSubmitReviewWarning('Please enter review.');
+    setSubmitReviewWarning("");
+
+    if (newReview.trim() === "") {
+      setSubmitReviewWarning("Please enter review.");
       return;
     }
-    
+
     if (rating === 0) {
-      setSubmitReviewWarning('Please give the rating.');
+      setSubmitReviewWarning("Please give the rating.");
       return;
     }
 
@@ -76,16 +78,16 @@ export default function ShopScreen({ route, navigation }: ShopScreenProps) {
           rating,
           shopId: shop.id,
           displayName: user?.user_metadata?.displayName,
-          comment: newReview
+          comment: newReview,
         };
 
         await submitShopReview(shop.id, review);
         await fetchReviews(); // Refresh reviews using the hook
         setRating(0);
-        setNewReview('');
+        setNewReview("");
       } catch (error) {
-        console.error('Error while submitting review', error);
-        errorHandler.handle(error, 'submit_review');
+        console.error("Error while submitting review", error);
+        errorHandler.handle(error, "submit_review");
       }
     });
   };
@@ -103,7 +105,12 @@ export default function ShopScreen({ route, navigation }: ShopScreenProps) {
               onPressIn={() => setRating(star)}
               style={styles.starButton}
             >
-              <Text style={[styles.starText, { color: star <= rating ? '#FFD700' : '#CCCCCC' }]}>
+              <Text
+                style={[
+                  styles.starText,
+                  { color: star <= rating ? "#FFD700" : "#CCCCCC" },
+                ]}
+              >
                 ★
               </Text>
             </TouchableOpacity>
@@ -121,234 +128,272 @@ export default function ShopScreen({ route, navigation }: ShopScreenProps) {
     );
   }
 
-  if(isLoadingReviews) {
-    return <LoadingSpinner />
+  if (isLoadingReviews) {
+    return <LoadingSpinner />;
   }
 
   return (
-    <ScrollView 
-      keyboardShouldPersistTaps='handled'
-      contentContainerStyle={styles.contentContainer}
-      style={styles.container}
-    >
-      <View style={styles.mapContainer}>
-        <MapView
-          style={styles.map}
-          loadingEnabled
-          initialRegion={{
-            latitude: shop.latitude,
-            longitude: shop.longitude,
-            latitudeDelta: 0.01,
-            longitudeDelta: 0.01,
-          }}
-          userInterfaceStyle={theme.mode}
-        >
-          <Marker
-            coordinate={{
+    <>
+      <ScrollView
+        keyboardShouldPersistTaps="handled"
+        contentContainerStyle={styles.contentContainer}
+        style={styles.container}
+      >
+        <View style={styles.mapContainer}>
+          <MapView
+            style={styles.map}
+            loadingEnabled
+            initialRegion={{
               latitude: shop.latitude,
               longitude: shop.longitude,
+              latitudeDelta: 0.01,
+              longitudeDelta: 0.01,
             }}
-            title={shop.name}
-          />
-        </MapView>
-      </View>
-
-      <View style={styles.detailsContainer}>
-        <Text style={styles.address}>{shop.address}</Text>
-        <View style={styles.addressAndCallContainer}>
-          <View style={styles.ratesContainer}>
-            <Text style={styles.rateText}>Making Charges: {shop.makingCharges}%</Text>
-            <Text style={styles.rateText}>Gold Rate: ₹{shop.goldRate}/g</Text>
-          </View>
-          <TouchableOpacity
-            style={styles.callButton}
-            onPress={() => protectedAction(() => handleContactPress(shop.phone))}
+            userInterfaceStyle={theme.mode}
           >
-            <Icon name="call" size={24} color={theme.colors.background} />
-          </TouchableOpacity>
+            <Marker
+              coordinate={{
+                latitude: shop.latitude,
+                longitude: shop.longitude,
+              }}
+              title={shop.name}
+            />
+          </MapView>
         </View>
-      </View>
 
-      <View style={styles.separator} />
-      <View style={styles.addReviewContainer}>
-        <StarRating />
-        <View style={styles.inputButtonContainer}>
-          <TextInput
-            style={styles.reviewInput}
-            placeholder="Write your review..."
-            placeholderTextColor={theme.colors.textSecondary}
-            value={newReview}
-            onChangeText={setNewReview}
-            multiline
-          />
-          <TouchableOpacity
-            style={styles.submitButton}
-            onPress={() => protectedAction(handleSubmitReview)}
-          >
-            <Text style={styles.submitButtonText}>Submit</Text>
-          </TouchableOpacity>
-        </View>
-        <Text style={[styles.warningText, !submitReviewWarning && styles.hiddenWarning]}>
-          {submitReviewWarning}
-        </Text>
-      </View>
-
-      <View style={styles.separator} />
-      <View style={styles.reviewsContainer}>
-        <Text style={styles.sectionTitle}>Reviews</Text>
-        {reviews?.map((review) => (
-          <View key={review.id} style={styles.reviewItem}>
-            <Text style={styles.reviewUser}>{review?.displayName || 'Unknown User'}</Text>
-            <Text style={styles.reviewRating}>Rating: {review.rating}/5</Text>
-            <Text style={styles.reviewComment}>{review.comment}</Text>
+        <View style={styles.detailsContainer}>
+          <Text style={styles.address}>{shop.address}</Text>
+          <View style={styles.addressAndCallContainer}>
+            <View style={styles.ratesContainer}>
+              <Text style={styles.rateText}>
+                Making Charges: {shop.makingCharges}%
+              </Text>
+              <Text style={styles.rateText}>Gold Rate: ₹{shop.goldRate}/g</Text>
+            </View>
+            <TouchableOpacity
+              style={styles.callButton}
+              onPress={() =>
+                protectedAction(() => handleContactPress(shop.phone))
+              }
+            >
+              <Icon name="call" size={24} color={theme.colors.background} />
+            </TouchableOpacity>
           </View>
-        ))}
-      </View>
-    </ScrollView>
+        </View>
+
+        <View style={styles.separator} />
+        <View style={styles.addReviewContainer}>
+          <StarRating />
+          <View style={styles.inputButtonContainer}>
+            <TextInput
+              style={styles.reviewInput}
+              placeholder="Write your review..."
+              placeholderTextColor={theme.colors.textSecondary}
+              value={newReview}
+              onChangeText={setNewReview}
+              multiline
+            />
+            <TouchableOpacity
+              style={styles.submitButton}
+              onPress={() => protectedAction(handleSubmitReview)}
+            >
+              <Text style={styles.submitButtonText}>Submit</Text>
+            </TouchableOpacity>
+          </View>
+          <Text
+            style={[
+              styles.warningText,
+              !submitReviewWarning && styles.hiddenWarning,
+            ]}
+          >
+            {submitReviewWarning}
+          </Text>
+        </View>
+
+        <View style={styles.separator} />
+        <View style={styles.reviewsContainer}>
+          <Text style={styles.sectionTitle}>Reviews</Text>
+          {reviews?.map((review) => (
+            <View key={review.id} style={styles.reviewItem}>
+              <Text style={styles.reviewUser}>
+                {review?.displayName || "Unknown User"}
+              </Text>
+              <Text style={styles.reviewRating}>Rating: {review.rating}/5</Text>
+              <Text style={styles.reviewComment}>{review.comment}</Text>
+            </View>
+          ))}
+        </View>  
+      </ScrollView>
+      {isMyShop && (
+          <TouchableOpacity
+            style={[styles.fab, { backgroundColor: theme.colors.primary }]}
+            onPress={() =>
+              navigation.navigate("CreateShop", {
+                title: "Update Shop",
+                shop,
+              })
+            }
+          >
+            <Icon name="edit" size={28} color={theme.colors.background} />
+          </TouchableOpacity>
+        )}
+    </>
   );
 }
 
-const makeStyles = (colors: Theme['colors']) => StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: colors.background,
-  },
-  contentContainer: {
-    // padding: 16,
-    paddingBottom: 100, // Adjust based on tab bar height
-  },
-  mapContainer: {
-    height: 200,
-    width: '100%',
-  },
-  map: {
-    flex: 1,
-  },
-  detailsContainer: {
-    padding: 15,
-  },
-  addressAndCallContainer: {
-    flexDirection: 'row',
-    justifyContent: 'space-between'
-  },
-  callButton: {
-    backgroundColor: colors.primary,
-    alignItems: 'center',
-    justifyContent: 'center',
-    height: 50,
-    width: 50,
-    borderRadius: 8
-  },
-  address: {
-    color: colors.textPrimary,
-    fontSize: 16,
-    marginBottom: 10,
-  },
-  ratesContainer: {
-    marginBottom: 15,
-  },
-  rateText: {
-    fontSize: 16,
-    fontWeight: '500',
-    color: colors.textSecondary
-  },
-  reviewsContainer: {
-    padding: 15,
-  },
-  sectionTitle: {
-    fontSize: 20,
-    fontWeight: 'bold',
-    marginBottom: 15,
-    color: colors.textPrimary
-  },
-  reviewItem: {
-    marginBottom: 15,
-    padding: 10,
-    backgroundColor: colors.secondaryBackground,
-    borderColor: colors.primary,
-    borderWidth: 1,
-    borderRadius: 8,
-  },
-  reviewUser: {
-    fontWeight: 'bold',
-    marginBottom: 5,
-    color: colors.textPrimary
-  },
-  reviewRating: {
-    color: colors.textSecondary,
-    marginBottom: 5,
-  },
-  reviewComment: {
-    fontSize: 14,
-    color: colors.textPrimary
-  },
-  addReviewContainer: {
-    padding: 15,
-    paddingTop: 0,
-  },
-  inputButtonContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 10,
-  },
-  reviewInput: {
-    flex: 1,
-    borderWidth: 1,
-    borderColor: colors.primary,
-    borderRadius: 8,
-    padding: 10,
-    minHeight: 50,
-    color: colors.textPrimary
-  },
-  submitButton: {
-    backgroundColor: colors.primary,
-    padding: 15,
-    borderRadius: 8,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  submitButtonText: {
-    color: colors.background,
-    fontWeight: 'bold',
-  },
-  ratingTitleContainer: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    paddingHorizontal: 5,
-    marginBottom: 5,
-  },
-  ratingTextContainer: {
-    flex: 1,
-  },
-  ratingTitle: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: colors.textPrimary,
-  },
-  starContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  starButton: {
-    padding: 3,
-  },
-  starText: {
-    fontSize: 24,
-  },
-  separator: {
-    height: 1,
-    backgroundColor: colors.primary,
-    marginBottom: 15,
-  },
-  warningText: {
-    color: 'red',
-    marginTop: 5,
-    fontSize: 14,
-    height: 'auto', // Default height when there is text
-  },
-  hiddenWarning: {
-    height: 0, // Make it disappear when empty
-    opacity: 0, // Hide the text
-  }
-});
+const makeStyles = (colors: Theme["colors"]) =>
+  StyleSheet.create({
+    container: {
+      flex: 1,
+      backgroundColor: colors.background,
+    },
+    contentContainer: {
+      // padding: 16,
+      // paddingBottom: 100, // Adjust based on tab bar height
+    },
+    mapContainer: {
+      height: 200,
+      width: "100%",
+    },
+    map: {
+      flex: 1,
+    },
+    detailsContainer: {
+      padding: 15,
+    },
+    addressAndCallContainer: {
+      flexDirection: "row",
+      justifyContent: "space-between",
+    },
+    callButton: {
+      backgroundColor: colors.primary,
+      alignItems: "center",
+      justifyContent: "center",
+      height: 50,
+      width: 50,
+      borderRadius: 8,
+    },
+    address: {
+      color: colors.textPrimary,
+      fontSize: 16,
+      marginBottom: 10,
+    },
+    ratesContainer: {
+      marginBottom: 15,
+    },
+    rateText: {
+      fontSize: 16,
+      fontWeight: "500",
+      color: colors.textSecondary,
+    },
+    reviewsContainer: {
+      padding: 15,
+    },
+    sectionTitle: {
+      fontSize: 20,
+      fontWeight: "bold",
+      marginBottom: 15,
+      color: colors.textPrimary,
+    },
+    reviewItem: {
+      marginBottom: 15,
+      padding: 10,
+      backgroundColor: colors.secondaryBackground,
+      borderColor: colors.primary,
+      borderWidth: 1,
+      borderRadius: 8,
+    },
+    reviewUser: {
+      fontWeight: "bold",
+      marginBottom: 5,
+      color: colors.textPrimary,
+    },
+    reviewRating: {
+      color: colors.textSecondary,
+      marginBottom: 5,
+    },
+    reviewComment: {
+      fontSize: 14,
+      color: colors.textPrimary,
+    },
+    addReviewContainer: {
+      padding: 15,
+      paddingTop: 0,
+    },
+    inputButtonContainer: {
+      flexDirection: "row",
+      alignItems: "center",
+      gap: 10,
+    },
+    reviewInput: {
+      flex: 1,
+      borderWidth: 1,
+      borderColor: colors.primary,
+      borderRadius: 8,
+      padding: 10,
+      minHeight: 50,
+      color: colors.textPrimary,
+    },
+    submitButton: {
+      backgroundColor: colors.primary,
+      padding: 15,
+      borderRadius: 8,
+      alignItems: "center",
+      justifyContent: "center",
+    },
+    submitButtonText: {
+      color: colors.background,
+      fontWeight: "bold",
+    },
+    ratingTitleContainer: {
+      flexDirection: "row",
+      justifyContent: "space-between",
+      alignItems: "center",
+      paddingHorizontal: 5,
+      marginBottom: 5,
+    },
+    ratingTextContainer: {
+      flex: 1,
+    },
+    ratingTitle: {
+      fontSize: 16,
+      fontWeight: "600",
+      color: colors.textPrimary,
+    },
+    starContainer: {
+      flexDirection: "row",
+      alignItems: "center",
+    },
+    starButton: {
+      padding: 3,
+    },
+    starText: {
+      fontSize: 24,
+    },
+    separator: {
+      height: 1,
+      backgroundColor: colors.primary,
+      marginBottom: 15,
+    },
+    warningText: {
+      color: "red",
+      marginTop: 5,
+      fontSize: 14,
+      height: "auto", // Default height when there is text
+    },
+    hiddenWarning: {
+      height: 0, // Make it disappear when empty
+      opacity: 0, // Hide the text
+    },
+    fab: {
+      position: "absolute",
+      bottom: 24,
+      right: 24,
+      width: 56,
+      height: 56,
+      borderRadius: 28,
+      alignItems: "center",
+      justifyContent: "center",
+      elevation: 4,
+    },
+  });

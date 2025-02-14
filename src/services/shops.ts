@@ -1,6 +1,5 @@
-import { useAuth } from '../contexts/AuthContext';
-import { supabase, supabaseStorageUrl } from '../lib/supabase'; // Assuming you have supabase initialized
-import { RootStackParamList, Shop } from '../types';
+import { supabase, supabaseStorageUrl } from '../lib/supabase';
+import { RootStackParamList, Shop, shopView } from '../types';
 import { errorHandler } from '../utils/errorHandler';
 import * as FileSystem from 'expo-file-system';
 import { Buffer } from 'buffer';
@@ -14,7 +13,7 @@ export const getShops = async (
   const PAGE_SIZE = 10;
   let query = supabase
     .from('shops')
-    .select('*')
+    .select(shopView)
     .range((page - 1) * PAGE_SIZE, page * PAGE_SIZE - 1);
 
   // Search
@@ -52,7 +51,7 @@ export const createShop = async (shopData: Partial<Shop>): Promise<Shop> => {
   const { data, error } = await supabase
     .from('shops')
     .insert([shopData])
-    .select()
+    .select(shopView)
     .single();
 
   if (error) throw errorHandler.handle(error);
@@ -71,13 +70,15 @@ export const createShop = async (shopData: Partial<Shop>): Promise<Shop> => {
 };
 
 export const updateShop = async (shopId: string, updates: Partial<Shop>): Promise<Shop> => {
+  const { location, ...safeUpdates } = updates;
   const { data, error } = await supabase
     .from('shops')
-    .update(updates)
+    .update(safeUpdates)
     .eq('id', shopId)
+    .select(shopView)
     .single();
 
-  if (error) throw errorHandler.handle(error);
+  if (error) throw errorHandler.handle(error, 'updateShop');
   return data as Shop;
 };
 
@@ -90,7 +91,7 @@ export const getMyShops = async (userId?: String): Promise<Shop[]> => {
 
   const { data, error } = await supabase
     .from('shop_owners')
-    .select('shops(*)')
+    .select(`shops(${shopView})`)
     .eq('userId', userId);
 
   if (error) return [];

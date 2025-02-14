@@ -14,6 +14,7 @@ export interface Shop {
   gallery: string[];
 }
 
+export const shopView = `id, name, locality, phone, makingCharges, goldRate, latitude, longitude, address, logoImage, gallery`
 export interface Review {
   id: string;
   rating: number;
@@ -51,11 +52,15 @@ export interface AuthContextType {
   sendOTP: (phone: string) => Promise<void>;
   verifyOTP: (phone: string, token: string) => Promise<void>;
   authError: AuthError | null;
+  myShops: Shop[];
+  fetchMyShops: () => Promise<void>;
+  createMyShop: (shopData: Partial<Shop>) => Promise<void>;
+  updateMyShop: (shopId: string, updates: Partial<Shop>) => Promise<void>
 }
 
 export type RootStackParamList = {
   MainTabs: undefined;
-  Shop: { shop: Shop };
+  Shop: { shop: Shop, isMyShop?: Boolean };
   Auth: undefined;
   Home: undefined;
   ShopList: {
@@ -70,13 +75,13 @@ export type RootStackParamList = {
       field: string;
       order: 'asc' | 'des'
     };
+    isMyShops?: Boolean;
   };
   FAQs: undefined;
   PrivacyPolicy: undefined;
   Settings: undefined;
   Inventory: undefined;
-  ShopProfile: { createNew?: boolean; shopId?: string };
-  CreateShop: undefined;
+  CreateShop: { title: 'Create Shop' } | { title: 'Update Shop'; shop: Shop };
   ShopAnalytics: undefined;
 };
 

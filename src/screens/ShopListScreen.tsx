@@ -8,10 +8,11 @@ import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { RootStackParamList, Shop } from '../types';
 import { RouteProp } from '@react-navigation/native';
 import SearchBar from '../components/SearchBar';
-import { getShops } from '../services/shops';
+import { getMyShops, getShops } from '../services/shops';
 import { errorHandler } from '../utils/errorHandler';
 import SectionHeader from '../components/SectionHeader';
 import LoadingSpinner from '../components/LoadingSpinner';
+import { useAuth } from '../contexts/AuthContext';
 
 type ShopListScreenProps = {
   navigation: NativeStackNavigationProp<RootStackParamList, 'ShopList'>;
@@ -21,8 +22,8 @@ type ShopListScreenProps = {
 export default function ShopListScreen({ route, navigation }: ShopListScreenProps) {
   const { theme } = useTheme();
   const styles = makeStyles(theme.colors);
-  const { title, searchQuery, filters, sort } = route.params;
-  
+  const { title, searchQuery, filters, sort, isMyShops } = route.params;
+  const { myShops } = useAuth()
 //   const [searchQuery, setSearchQuery] = useState('');
   const [shops, setShops] = useState<Shop[]>([]);
   const [page, setPage] = useState(1);
@@ -51,7 +52,11 @@ export default function ShopListScreen({ route, navigation }: ShopListScreenProp
     const debounceTimer = setTimeout(() => {
       setPage(1);
       setIsShopLoading(true);
-      loadShops(1);
+      if (isMyShops) {
+        setShops(myShops);
+      } else {
+        loadShops(1);
+      }
       setIsShopLoading(false);
     }, 500);
 
