@@ -12,7 +12,6 @@ import {
 import { useTheme } from "../contexts/ThemeContext";
 import { uploadFile } from "../services/shops";
 import { errorHandler } from "../utils/errorHandler";
-import { useAuth } from "../contexts/AuthContext";
 import { RootStackParamList, Shop } from "../types";
 import { RouteProp, useNavigation } from "@react-navigation/native";
 import { Icon } from "react-native-elements";
@@ -23,6 +22,7 @@ import * as FileSystem from "expo-file-system";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { Theme } from "../constants/Theme";
 import LoadingSpinner from "../components/LoadingSpinner";
+import useAppContext from '../hooks/useAppContext';
 
 type CreateShopScreenProps = {
   route: RouteProp<RootStackParamList, "CreateShop">;
@@ -33,7 +33,7 @@ export default function CreateShopScreen({ route }: CreateShopScreenProps) {
   const { title } = route.params;
 
   const { theme } = useTheme();
-  const { user, createMyShop, updateMyShop } = useAuth();
+  const { user, createMyShop, updateMyShop } = useAppContext();
   const styles = makeStyles(theme.colors);
   const navigation = useNavigation();
 

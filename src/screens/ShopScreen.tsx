@@ -27,6 +27,7 @@ import { Theme } from "../constants/Theme";
 import { handleContactPress } from "../helpers";
 import useStatusBarColor from "../hooks/useStatusBarColor";
 import { SafeAreaView } from "react-native-safe-area-context";
+import useAppContext from "../hooks/useAppContext";
 
 type ShopScreenProps = {
   route: RouteProp<RootStackParamList, "Shop">;
@@ -39,7 +40,7 @@ export default function ShopScreen({ route, navigation }: ShopScreenProps) {
   const [newReview, setNewReview] = useState("");
   const [rating, setRating] = useState(0);
   const [submitReviewWarning, setSubmitReviewWarning] = useState("");
-  const { user, myShops } = useAuth();
+  const { user, myShops } = useAppContext();
   const protectedAction = useProtectedAction();
   const { theme } = useTheme();
 

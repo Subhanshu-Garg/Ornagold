@@ -12,7 +12,7 @@ import { getMyShops, getShops } from '../services/shops';
 import { errorHandler } from '../utils/errorHandler';
 import SectionHeader from '../components/SectionHeader';
 import LoadingSpinner from '../components/LoadingSpinner';
-import { useAuth } from '../contexts/AuthContext';
+import useAppContext from '../hooks/useAppContext';
 
 type ShopListScreenProps = {
   navigation: NativeStackNavigationProp<RootStackParamList, 'ShopList'>;
@@ -23,7 +23,7 @@ export default function ShopListScreen({ route, navigation }: ShopListScreenProp
   const { theme } = useTheme();
   const styles = makeStyles(theme.colors);
   const { title, searchQuery, filters, sort, isMyShops } = route.params;
-  const { myShops } = useAuth()
+  const { myShops } = useAppContext();
 //   const [searchQuery, setSearchQuery] = useState('');
   const [shops, setShops] = useState<Shop[]>([]);
   const [page, setPage] = useState(1);

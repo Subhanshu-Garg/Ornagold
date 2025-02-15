@@ -1,15 +1,13 @@
 import React, { createContext, useContext, useEffect, useState, useMemo } from 'react';
 import { AuthError, Session, User } from '@supabase/supabase-js';
 import { supabase } from '../lib/supabase';
-import { AuthContextType, Shop, SignInParams, SignUpParams, UpdateProfileParams } from '../types';
-import { createShop, getMyShops, updateShop } from '../services/shops';
+import { AuthContextType, SignInParams, SignUpParams, UpdateProfileParams } from '../types';
 import { Alert } from 'react-native';
 
 const AuthContext = createContext<AuthContextType>({} as AuthContextType);
 
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
   const [user, setUser] = useState<User | null>(null);
-  const [myShops, setMyShops] = useState<Shop[]>([])
   const [loading, setLoading] = useState(true);
   const [authError, setAuthError] = useState<AuthError | null>(null);
 
@@ -18,7 +16,6 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       try {
         const { data: { session } } = await supabase.auth.getSession();
         setUser(session?.user ?? null);
-        setMyShops(await getMyShops(user?.id))
         const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
           setUser(session?.user ?? null);
         });
@@ -33,10 +30,6 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
 
     initializeAuth();
   }, []);
-
-  useEffect(() => {
-    fetchMyShops()
-  }, [user])
 
   const signIn = async (params: SignInParams) => {
     setLoading(true);
@@ -192,49 +185,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     }
   };
 
-  const createMyShop = async (shopData: Partial<Shop>) => {
-    try {
-      setLoading(true)
-      const shop = await createShop(shopData)
-      setMyShops([shop, ...myShops])
-      Alert.alert('Shop created successfully')
-    } catch (error) {
-      Alert.alert('Error while creating shop')
-    } finally {
-      setLoading(false)
-    }
-  }
-
-  const updateMyShop = async (shopId: string, updates: Partial<Shop>) => {
-    try {
-      setLoading(true)
-      const shop = await updateShop(shopId, updates)
-      const updatedShopIdx = myShops.findIndex(myShop => myShop.id === shopId)
-      myShops[updatedShopIdx] = shop
-      setMyShops(myShops)
-      setLoading(false)
-      Alert.alert('Shop updated successfully')
-    } catch (error) {
-      Alert.alert('Error while updating shop')
-    } finally {
-      setLoading(false)
-    }
-  }
-
-  const fetchMyShops = async () => {
-    try {
-      setLoading(true)
-      const shops = await getMyShops(user?.id)
-      setMyShops(shops)
-    } catch (error) {
-      console.error('Error in fetching shops', error)
-    } finally {
-      setLoading(false)
-    }
-  }
-
   const value = useMemo(() => ({
-    myShops,
     user,
     loading,
     signIn,
@@ -243,10 +194,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     authError,
     updateProfile,
     sendOTP,
-    verifyOTP,
-    fetchMyShops,
-    createMyShop,
-    updateMyShop
+    verifyOTP
   }), [user, loading, authError]);
 
   return (

@@ -21,6 +21,7 @@ import ReachOutSection from '../components/ReachOutSection';
 import PartnerLogos from '../components/PartnerLogos';
 import MetricCards from '../components/MetricCards';
 import useStatusBarColor from '../hooks/useStatusBarColor';
+import useAppContext from '../hooks/useAppContext';
 // import { SafeAreaView } from 'react-native-safe-area-context';
 
 type HomeScreenProps = {
@@ -58,7 +59,7 @@ export default function HomeScreen({ navigation }: HomeScreenProps) {
   const {  loading } = useAuth()
   const [shops, setShops] = useState<Shop[]>([]);
   const { theme } = useTheme();
-  const [location, setLocation] = useState<Location.LocationObject | null>(null);
+  const { location, reverseGeocode } = useAppContext();
   const [currentCity, setCurrentCity] = useState('');
   const [activeBanner, setActiveBanner] = useState(0);
   const { setHeaderColor } = useHeaderColor();
@@ -68,23 +69,11 @@ export default function HomeScreen({ navigation }: HomeScreenProps) {
 
   // Use the hook with header color
   useStatusBarColor(theme.colors.secondaryBackground);
-
-  useEffect(() => {
-    (async () => {
-      let { status } = await Location.requestForegroundPermissionsAsync();
-      if (status !== 'granted') {
-        Alert.alert('Permission to access location was denied');
-        return;
-      }
-      const location = await Location.getCurrentPositionAsync({});
-      setLocation(location);
-    })();
-  }, []);
-
+  
   useEffect(() => {
     (async () => {
       if(location) {
-        const geo = await Location.reverseGeocodeAsync(location.coords);
+        const geo = await reverseGeocode(location);
         setCurrentCity(geo[0].city || '');
       }
     })();

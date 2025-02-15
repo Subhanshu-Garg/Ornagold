@@ -52,10 +52,6 @@ export interface AuthContextType {
   sendOTP: (phone: string) => Promise<void>;
   verifyOTP: (phone: string, token: string) => Promise<void>;
   authError: AuthError | null;
-  myShops: Shop[];
-  fetchMyShops: () => Promise<void>;
-  createMyShop: (shopData: Partial<Shop>) => Promise<void>;
-  updateMyShop: (shopId: string, updates: Partial<Shop>) => Promise<void>
 }
 
 export type RootStackParamList = {

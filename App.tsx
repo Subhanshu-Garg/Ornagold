@@ -38,6 +38,7 @@ import PrivacyPolicyScreen from "./src/screens/PrivacyPolicyScreen";
 import * as Updates from "expo-updates";
 import Constants from "expo-constants";
 import CreateShopScreen from "./src/screens/CreateShopScreen";
+import App from "./src/App";
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
 const Tab = createBottomTabNavigator<TabStackParamList>();
@@ -202,11 +203,11 @@ export default function AppWrapper() {
   }, []);
   return (
     <ThemeProvider>
-      <AuthProvider>
+      <App>
         <ErrorBoundary>
           <Navigation />
         </ErrorBoundary>
-      </AuthProvider>
+      </App>
     </ThemeProvider>
   );
 }

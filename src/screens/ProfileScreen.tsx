@@ -6,7 +6,6 @@ import {
   StyleSheet,
   ScrollView,
 } from "react-native";
-import { useAuth } from "../contexts/AuthContext";
 import { useTheme } from "../contexts/ThemeContext";
 import { Icon } from "react-native-elements";
 import { Share } from "react-native";
@@ -19,6 +18,7 @@ import { Theme } from "../constants/Theme";
 import useStatusBarColor from "../hooks/useStatusBarColor";
 import { errorHandler } from "../utils/errorHandler";
 import { getMyShops } from "../services/shops";
+import useAppContext from "../hooks/useAppContext";
 
 type ProfileScreenNavigationProp =
   NativeStackNavigationProp<RootStackParamList>;
@@ -28,7 +28,7 @@ type ProfileScreenProps = {
 };
 
 export default function ProfileScreen({ navigation }: ProfileScreenProps) {
-  const { user, myShops, signOut } = useAuth();
+  const { user, myShops, signOut } = useAppContext();
   const { theme } = useTheme();
   const styles = makeStyles(theme.colors);
   const [isEditModalVisible, setEditModalVisible] = useState(false);
