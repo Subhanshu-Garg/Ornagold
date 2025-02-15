@@ -3,6 +3,7 @@ import { Shop } from '../types';
 import { createShop, getMyShops, updateShop } from '../services/shops';
 import { Alert } from 'react-native';
 import { useAuth } from './AuthContext';
+import AppError from '../utils/errorHandler';
 
 type ShopContextType = {
   myShops: Shop[];
@@ -20,11 +21,16 @@ export const ShopProvider = ({ children }: { children: React.ReactNode }) => {
   const [loading, setLoading] = useState(false);
   
   useEffect(() => {
-    fetchMyShops()
+    if(user) {
+      fetchMyShops()
+    } else {
+      setMyShops([])
+    }
   }, [user])
 
   const fetchMyShops = async () => {
     try {
+      if(!user) return
       setLoading(true);
       const shops = await getMyShops(user?.id);
       setMyShops(shops);
@@ -37,6 +43,7 @@ export const ShopProvider = ({ children }: { children: React.ReactNode }) => {
 
   const createMyShop = async (shopData: Partial<Shop>) => {
     try {
+      if(!user) throw new AppError('VALIDATION', 'Authentication required!')
       setLoading(true);
       const shop = await createShop(shopData);
       setMyShops([shop, ...myShops]);
@@ -50,6 +57,7 @@ export const ShopProvider = ({ children }: { children: React.ReactNode }) => {
 
   const updateMyShop = async (shopId: string, updates: Partial<Shop>) => {
     try {
+      if(!user) throw new AppError('VALIDATION', 'Authentication required!')
       setLoading(true);
       const shop = await updateShop(shopId, updates);
       const updatedShops = myShops.map(s => s.id === shopId ? shop : s);

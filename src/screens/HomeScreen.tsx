@@ -103,6 +103,7 @@ export default function HomeScreen({ navigation }: HomeScreenProps) {
       );
       setHasMore(hasMore);
     } catch (error) {
+      console.log(error)
       errorHandler.handle(error, 'shop_list');
     }
   };
