@@ -56,12 +56,14 @@ export default function ProfileScreen({ navigation }: ProfileScreenProps) {
                 color={theme.colors.background}
                 containerStyle={styles.avatar}
               />
-              <TouchableOpacity
-                style={styles.editIcon}
-                onPress={() => setEditModalVisible(true)}
-              >
-                <Icon name="edit" size={16} color={theme.colors.primary} />
-              </TouchableOpacity>
+              {user && (
+                <TouchableOpacity
+                  style={styles.editIcon}
+                  onPress={() => setEditModalVisible(true)}
+                >
+                  <Icon name="edit" size={16} color={theme.colors.primary} />
+                </TouchableOpacity>
+              )}
             </View>
             <View style={styles.profileDetails}>
               <Text style={styles.userName}>
@@ -78,26 +80,27 @@ export default function ProfileScreen({ navigation }: ProfileScreenProps) {
         </View>
 
         {/* Shop Owner Section */}
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Business Tools</Text>
-          {isShopOwner && (
-            <>
-              <MenuItem
-                icon="store"
-                title="My Shops"
-                color={theme.colors.primary}
-                onPress={() =>
-                  myShops.length > 1
-                    ? navigation.navigate("ShopList", {
-                        title: "My Shops",
-                        isMyShops: true,
-                      })
-                    : navigation.navigate("Shop", {
-                        shop: myShops[0],
-                      })
-                }
-              />
-              {/* <MenuItem
+        {user && (
+          <View style={styles.section}>
+            <Text style={styles.sectionTitle}>Business Tools</Text>
+            {isShopOwner && (
+              <>
+                <MenuItem
+                  icon="store"
+                  title="My Shops"
+                  color={theme.colors.primary}
+                  onPress={() =>
+                    myShops.length > 1
+                      ? navigation.navigate("ShopList", {
+                          title: "My Shops",
+                          isMyShops: true,
+                        })
+                      : navigation.navigate("Shop", {
+                          shop: myShops[0],
+                        })
+                  }
+                />
+                {/* <MenuItem
               icon="analytics"
               title="Shop Analytics"
               color={theme.colors.primary}
@@ -109,19 +112,20 @@ export default function ProfileScreen({ navigation }: ProfileScreenProps) {
               color={theme.colors.primary}
               onPress={() => navigation.navigate('Inventory')}
             /> */}
-            </>
-          )}
-          <MenuItem
-            icon="add-business"
-            title="Create New Shop"
-            color={theme.colors.primary}
-            onPress={() =>
-              navigation.navigate("CreateShop", {
-                title: "Create Shop",
-              })
-            }
-          />
-        </View>
+              </>
+            )}
+            <MenuItem
+              icon="add-business"
+              title="Create New Shop"
+              color={theme.colors.primary}
+              onPress={() =>
+                navigation.navigate("CreateShop", {
+                  title: "Create Shop",
+                })
+              }
+            />
+          </View>
+        )}
 
         {/* General Features */}
         <View style={styles.section}>

@@ -10,19 +10,25 @@ type Metric = {
   value: string;
   change: string;
   isPositive: boolean;
+  lastUpdated: string;
 };
 
 const MetricCards = () => {
   const { theme } = useTheme();
   const styles = makeStyles(theme.colors);
-  const [goldRate, setGoldRate] = useState('');
+  const [metric, setMetric] = useState({
+    rate: 'N/A',
+    change: 0,
+    changePercent: 'N/A',
+    lastUpdated: 'N/A'
+  });
 
   useEffect(() => {
     const getGoldRate = async () => {
-      const rate = await fetchGoldRate().catch((error) => {
+      const data = await fetchGoldRate().catch((error) => {
         console.error('Error while fetching gold rate', error)
       })
-      setGoldRate(rate || 'N/A')
+      if (data) setMetric(data)
     }
 
     getGoldRate()
@@ -31,15 +37,17 @@ const MetricCards = () => {
   const metrics: Metric[] = [
     {
       title: "24K Gold Rate",
-      value: goldRate,
-      change: "↓ 1.2%",
-      isPositive: false,
+      value: metric.rate,
+      change: metric.changePercent,
+      isPositive: metric.change >= 0,
+      lastUpdated: metric.lastUpdated
     },
     {
       title: "Making Charges",
       value: "12% Avg",
       change: "→ 0%",
       isPositive: true,
+      lastUpdated: 'Yesterday'
     },
   ];
 
@@ -67,6 +75,12 @@ const MetricCards = () => {
             >
               {item.change}
             </Text>
+            {item.lastUpdated && (
+              <View style={styles.updatedContainer}>
+                <Text style={styles.updatedLabel}>Last updated:</Text>
+                <Text style={styles.updatedValue}>{item.lastUpdated}</Text>
+              </View>
+            )}
           </View>
         )}
         contentContainerStyle={styles.container}
@@ -102,6 +116,18 @@ const makeStyles = (colors: Theme["colors"]) =>
     },
     change: {
       fontSize: 14,
+    },
+    updatedContainer: {
+      marginTop: 8,
+    },
+    updatedLabel: {
+      color: colors.textSecondary,
+      fontSize: 12,
+    },
+    updatedValue: {
+      color: colors.textSecondary,
+      fontSize: 12,
+      marginTop: 2, // Small space between label and value
     },
   });
 

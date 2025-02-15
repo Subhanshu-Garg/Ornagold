@@ -168,7 +168,9 @@ export default function HomeScreen({ navigation }: HomeScreenProps) {
             <ShopListContainer
               title="Best Deals"
               shops={shops}
-              onViewAll={() => console.log('View all is pressed')}
+              onViewAll={() => navigation.navigate('ShopList',  {
+                title: 'Best Deals',
+              })}
               filter={s => Number(s.makingCharges) < 15}
               onShopPress={handleShopPress}
               location={location}
