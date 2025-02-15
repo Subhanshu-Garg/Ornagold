@@ -3,7 +3,7 @@ import * as Linking from 'expo-linking';
 export const handleContactPress = async (phoneNum: string | void) => {
     try {
       const rawNumber = phoneNum || '+917011564838'; // Default without country code
-      const sanitized = sanitizePhoneNum(rawNumber);
+      const sanitized = sanitizePhoneNum(rawNumber) || rawNumber;
       const phoneNumber = `tel:${sanitized}`;
       const supported = await Linking.canOpenURL(phoneNumber)
       
@@ -35,9 +35,14 @@ export const sanitizePhoneNum = (phoneNum: string) => {
 };
 
 export const validatePhoneNumber = (phone: string): boolean => {
-  // Remove all non-digit characters
-  const cleaned = phone.replace(/\D/g, '');
+  // Remove all non-digit characters except leading +
+  const cleaned = phone.replace(/[^\d+]/g, '');
   
-  // Check if the cleaned number has exactly 10 digits
-  return /^\d{10}$/.test(cleaned);
+  // Check if the number is either:
+  // 1. Exactly 10 digits, or
+  // 2. Starts with +91 followed by 10 digits, or
+  // 3. Starts with 91 followed by 10 digits
+  return /^\d{10}$/.test(cleaned) || 
+         /^\+91\d{10}$/.test(cleaned) || 
+         /^91\d{10}$/.test(cleaned);
 };

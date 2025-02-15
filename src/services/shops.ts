@@ -98,12 +98,11 @@ export const getMyShops = async (userId?: String): Promise<Shop[]> => {
   return (data?.map(owner => owner.shops) || []) as unknown as Shop[];
 };
 
-export const uploadFile = async (localUri: string) => {
+export const uploadFile = async (localUri: string, fileName: string) => {
   try {
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) throw new Error('User not authenticated');
-
-    const fileName = `shop-logo-${Date.now()}`;
+    
     const fileType = localUri.split('/').pop()?.split('.').pop() || 'jpeg';
     const filePath = `${user.id}/${fileName}`;
 
@@ -115,7 +114,7 @@ export const uploadFile = async (localUri: string) => {
       .from('shop-logos')
       .upload(filePath, decode(fileData), {
         contentType: `image/${fileType}`,
-        upsert: false,
+        upsert: true,
       });
 
     if (error) throw error;

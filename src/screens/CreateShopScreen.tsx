@@ -163,7 +163,7 @@ export default function CreateShopScreen({ route }: CreateShopScreenProps) {
       
       // Only upload if it's a local file
       if (shop.logoImage?.startsWith('file://')) {
-        const uploadResponse = await uploadFile(shop.logoImage);
+        const uploadResponse = await uploadFile(shop.logoImage, `shop-logo-${shop.name.toLowerCase().replaceAll(' ', '-')}`);
         logoUrl = uploadResponse.url;
       }
 
