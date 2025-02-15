@@ -18,11 +18,11 @@ import { RouteProp, useNavigation } from "@react-navigation/native";
 import { Icon } from "react-native-elements";
 import * as Location from "expo-location";
 import { SafeAreaView } from "react-native-safe-area-context";
-import * as ImagePicker from 'expo-image-picker';
-import * as FileSystem from 'expo-file-system';
+import * as ImagePicker from "expo-image-picker";
+import * as FileSystem from "expo-file-system";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { Theme } from "../constants/Theme";
-
+import LoadingSpinner from "../components/LoadingSpinner";
 
 type CreateShopScreenProps = {
   route: RouteProp<RootStackParamList, "CreateShop">;
@@ -30,30 +30,35 @@ type CreateShopScreenProps = {
 };
 
 export default function CreateShopScreen({ route }: CreateShopScreenProps) {
-  const { title } = route.params
-  
+  const { title } = route.params;
+
   const { theme } = useTheme();
   const { user, createMyShop, updateMyShop } = useAuth();
   const styles = makeStyles(theme.colors);
   const navigation = useNavigation();
 
-  const initialShop: Shop = title === 'Update Shop' ? route.params.shop : {
-    id: "",
-    name: "",
-    address: "",
-    phone: `+${user?.phone}`,
-    locality: "",
-    goldRate: "",
-    makingCharges: "",
-    latitude: 0,
-    longitude: 0,
-    logoImage: "",
-    gallery: []
-  }
-  const [shop, setShop] = useState<Shop>(initialShop);
+  const initialShop: Partial<Shop> =
+    title === "Update Shop"
+      ? route.params.shop
+      : {
+          name: "",
+          address: "",
+          phone: `+${user?.phone}`,
+          locality: "",
+          goldRate: "",
+          makingCharges: "",
+          latitude: 0,
+          longitude: 0,
+          logoImage: "",
+          gallery: [],
+        };
+  const [shop, setShop] = useState<Partial<Shop>>(initialShop);
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [hasLocation, setHasLocation] = useState(Boolean(shop.latitude && shop.longitude));
+  const [hasLocation, setHasLocation] = useState(
+    Boolean(shop.latitude && shop.longitude)
+  );
+  const [isLoading, setIsLoading] = useState(false);
 
   const validateForm = () => {
     const newErrors: Record<string, string> = {};
@@ -73,13 +78,26 @@ export default function CreateShopScreen({ route }: CreateShopScreenProps) {
 
   const handleLocation = async () => {
     try {
+      setIsLoading(true);
       let { status } = await Location.requestForegroundPermissionsAsync();
       if (status !== "granted") {
         Alert.alert("Permission to access location was denied");
         return;
       }
 
-      const location = await Location.getCurrentPositionAsync({});
+      // Check if precise location is enabled
+    const providerStatus = await Location.getProviderStatusAsync();
+    if (!providerStatus.locationServicesEnabled || !providerStatus.gpsAvailable) {
+      Alert.alert(
+        "Precise Location Required",
+        "Please enable precise location in your device settings to continue."
+      );
+      return;
+    }
+
+      const location = await Location.getCurrentPositionAsync({
+        accuracy: Location.Accuracy.BestForNavigation,
+      });
       const [reverseGeocode] = await Location.reverseGeocodeAsync({
         latitude: location.coords.latitude,
         longitude: location.coords.longitude,
@@ -98,22 +116,25 @@ export default function CreateShopScreen({ route }: CreateShopScreenProps) {
         longitude: location.coords.longitude,
       }));
       setHasLocation(true);
-      setErrors(prev => ({ ...prev, location: '' }));
+      setErrors((prev) => ({ ...prev, location: "" }));
     } catch (error) {
       errorHandler.handle(error, "location");
+    } finally {
+      setIsLoading(false);
     }
   };
 
   const handleImageUpload = async () => {
     try {
-      const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
-      if (status !== 'granted') {
-        Alert.alert('Permission to access photos is required');
+      const { status } =
+        await ImagePicker.requestMediaLibraryPermissionsAsync();
+      if (status !== "granted") {
+        Alert.alert("Permission to access photos is required");
         return;
       }
 
       const result = await ImagePicker.launchImageLibraryAsync({
-        mediaTypes: ['images'],
+        mediaTypes: ["images"],
         allowsEditing: false,
         aspect: [1, 1],
         quality: 0.7,
@@ -121,36 +142,40 @@ export default function CreateShopScreen({ route }: CreateShopScreenProps) {
 
       if (!result.canceled) {
         const file = result.assets[0];
-        
+
         // Check file type
-        const allowedFormats = ['jpg', 'jpeg', 'png', 'webp'];
-        const fileExtension = file.uri.split('.').pop()?.toLowerCase();
+        const allowedFormats = ["jpg", "jpeg", "png", "webp"];
+        const fileExtension = file.uri.split(".").pop()?.toLowerCase();
         if (!fileExtension || !allowedFormats.includes(fileExtension)) {
           Alert.alert(
-            'Invalid File Format',
-            'Please upload an image in JPG, PNG, or WEBP format.'
+            "Invalid File Format",
+            "Please upload an image in JPG, PNG, or WEBP format."
           );
           return;
         }
 
         // Check file size
         const fileInfo = await FileSystem.getInfoAsync(file.uri);
-        if (fileInfo.exists && fileInfo.size !== undefined && fileInfo.size > 200 * 1024) {
+        if (
+          fileInfo.exists &&
+          fileInfo.size !== undefined &&
+          fileInfo.size > 200 * 1024
+        ) {
           Alert.alert(
-            'File Too Large',
-            'Maximum allowed size is 200KB. Please choose a smaller image.'
+            "File Too Large",
+            "Maximum allowed size is 200KB. Please choose a smaller image."
           );
           return;
         }
 
         // Store local URI temporarily
-        setShop(prev => ({ 
-          ...prev, 
-          logoImage: file.uri 
+        setShop((prev) => ({
+          ...prev,
+          logoImage: file.uri,
         }));
       }
     } catch (error) {
-      errorHandler.handle(error, 'image_selection');
+      errorHandler.handle(error, "image_selection");
     }
   };
 
@@ -160,23 +185,26 @@ export default function CreateShopScreen({ route }: CreateShopScreenProps) {
     setIsSubmitting(true);
     try {
       let logoUrl = shop.logoImage;
-      
       // Only upload if it's a local file
-      if (shop.logoImage?.startsWith('file://')) {
-        const uploadResponse = await uploadFile(shop.logoImage, `shop-logo-${shop.name.toLowerCase().replaceAll(' ', '-')}`);
+      if (shop.logoImage?.startsWith("file://")) {
+        const uploadResponse = await uploadFile(
+          shop.logoImage,
+          `shop-logo-${shop.name!.toLowerCase().replaceAll(" ", "-")}`
+        );
         logoUrl = uploadResponse.url;
       }
 
-      if(title === 'Create Shop') {
+      if (title === "Create Shop") {
         createMyShop({
           ...shop,
-          logoImage: logoUrl
-        })
+          logoImage: logoUrl,
+        });
       } else {
+        if (!shop.id) throw Error('No shop exist!')
         updateMyShop(shop.id, {
           ...shop,
-          logoImage: logoUrl
-        })
+          logoImage: logoUrl,
+        });
       }
 
       navigation.goBack();
@@ -188,7 +216,10 @@ export default function CreateShopScreen({ route }: CreateShopScreenProps) {
   };
 
   return (
-    <ScrollView contentContainerStyle={styles.container} keyboardShouldPersistTaps='handled'>
+    <ScrollView
+      contentContainerStyle={styles.container}
+      keyboardShouldPersistTaps="handled"
+    >
       <View style={styles.formSection}>
         <Text style={styles.sectionTitle}>Basic Information</Text>
 
@@ -271,17 +302,27 @@ export default function CreateShopScreen({ route }: CreateShopScreenProps) {
           style={[styles.locationButton, errors.location && styles.errorInput]}
           onPress={handleLocation}
         >
-          <Icon
-            name="location-on"
-            size={20}
-            color={hasLocation ? theme.colors.success : theme.colors.primary}
-          />
-          <Text style={styles.locationButtonText}>
-            {hasLocation ? "Location Set (Tap to Update)" : "Set Current Location"}
-          </Text>
+          {isLoading ? (
+            <LoadingSpinner />
+          ) : (
+            <>
+              <Icon
+                name="location-on"
+                size={20}
+                color={
+                  hasLocation ? theme.colors.success : theme.colors.primary
+                }
+              />
+              <Text style={styles.locationButtonText}>
+                {hasLocation
+                  ? "Location Set (Tap to Update)"
+                  : "Set Current Location"}
+              </Text>
+            </>
+          )}
         </TouchableOpacity>
         {errors.location && (
-             <Text style={styles.errorText}>{errors.location}</Text>
+          <Text style={styles.errorText}>{errors.location}</Text>
         )}
 
         <View style={styles.inputGroup}>
@@ -294,32 +335,36 @@ export default function CreateShopScreen({ route }: CreateShopScreenProps) {
             multiline
             numberOfLines={3}
           />
-          {errors.address && <Text style={styles.errorText}>{errors.address}</Text>}
+          {errors.address && (
+            <Text style={styles.errorText}>{errors.address}</Text>
+          )}
         </View>
       </View>
 
       <View style={styles.formSection}>
         <Text style={styles.sectionTitle}>Shop Logo</Text>
-        
-        <TouchableOpacity 
+
+        <TouchableOpacity
           style={styles.uploadButton}
           onPress={handleImageUpload}
         >
           {shop.logoImage ? (
-            <Image 
-              source={{ uri: shop.logoImage }} 
-              style={styles.logoPreview} 
+            <Image
+              source={{ uri: shop.logoImage }}
+              style={styles.logoPreview}
             />
           ) : (
             <View style={styles.uploadContent}>
-              <Icon 
-                name="camera-alt" 
-                size={32} 
-                color={theme.colors.textSecondary} 
+              <Icon
+                name="camera-alt"
+                size={32}
+                color={theme.colors.textSecondary}
               />
               <View style={styles.uploadTextContainer}>
                 <Text style={styles.uploadText}>Tap to upload logo</Text>
-                <Text style={styles.uploadText}>(JPEG, PNG, WEBP, max 200KB)</Text>
+                <Text style={styles.uploadText}>
+                  (JPEG, PNG, WEBP, max 200KB)
+                </Text>
               </View>
             </View>
           )}
@@ -340,7 +385,7 @@ export default function CreateShopScreen({ route }: CreateShopScreenProps) {
 }
 
 // Reuse the makeStyles from ShopProfileScreen
-const makeStyles = (colors: Theme['colors']) =>
+const makeStyles = (colors: Theme["colors"]) =>
   StyleSheet.create({
     container: {
       padding: 20,
@@ -474,33 +519,33 @@ const makeStyles = (colors: Theme['colors']) =>
       color: colors.success,
     },
     uploadButton: {
-      width: '100%',
+      width: "100%",
       aspectRatio: 1,
       backgroundColor: colors.background,
       borderRadius: 12,
       borderWidth: 2,
       borderColor: colors.textPrimary,
-      justifyContent: 'center',
-      alignItems: 'center',
-      overflow: 'hidden',
+      justifyContent: "center",
+      alignItems: "center",
+      overflow: "hidden",
     },
     logoPreview: {
-      width: '100%',
-      height: '100%',
-      resizeMode: 'cover',
+      width: "100%",
+      height: "100%",
+      resizeMode: "cover",
     },
     uploadContent: {
-      alignItems: 'center',
+      alignItems: "center",
       gap: 10,
       padding: 20,
     },
     uploadTextContainer: {
-      alignItems: 'center',
+      alignItems: "center",
       gap: 4,
     },
     uploadText: {
       color: colors.textSecondary,
       fontSize: 14,
-      textAlign: 'center',
+      textAlign: "center",
     },
   });

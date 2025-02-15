@@ -1,5 +1,5 @@
 import React, { useState, useLayoutEffect, useEffect, useRef } from 'react';
-import { StyleSheet, View, TouchableOpacity, Text, ScrollView, Image, FlatList, Dimensions, SafeAreaView, Platform } from 'react-native';
+import { StyleSheet, View, TouchableOpacity, Text, ScrollView, Image, FlatList, Dimensions, SafeAreaView, Platform, Alert } from 'react-native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { Banner, RootStackParamList, Shop, TabStackParamList } from '../types';
 import SearchBar from '../components/SearchBar';
@@ -73,10 +73,10 @@ export default function HomeScreen({ navigation }: HomeScreenProps) {
     (async () => {
       let { status } = await Location.requestForegroundPermissionsAsync();
       if (status !== 'granted') {
-        console.log('Permission to access location was denied');
+        Alert.alert('Permission to access location was denied');
         return;
       }
-      let location = await Location.getCurrentPositionAsync({});
+      const location = await Location.getCurrentPositionAsync({});
       setLocation(location);
     })();
   }, []);
@@ -167,7 +167,7 @@ export default function HomeScreen({ navigation }: HomeScreenProps) {
               shops={shops}
               onShopPress={handleShopPress}
               onViewAll={() => navigation.navigate('ShopList',  {
-                title: 'Popular Shops Near You'
+                title: 'Popular Shops Near You',
               })}
               location={location}
               showDistance={true}

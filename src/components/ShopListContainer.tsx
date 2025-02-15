@@ -37,8 +37,8 @@ const ShopListContainer = ({
       <ShopList
         shops={filteredShops.slice(0, 4)}
         onShopPress={onShopPress}
-        horizontal
-        showDistance
+        horizontal={horizontal}
+        showDistance={showDistance}
         location={location}
       />
     </>

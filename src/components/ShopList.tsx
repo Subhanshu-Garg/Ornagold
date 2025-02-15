@@ -30,16 +30,23 @@ export default function ShopList({
 
   const calculateDistance = (shopLat: number, shopLon: number) => {
     if (!location) return 'N/A';
-    const R = 6371;
+    
+    const R = 6371; // Earth radius in km
     const dLat = (shopLat - location.coords.latitude) * Math.PI / 180;
     const dLon = (shopLon - location.coords.longitude) * Math.PI / 180;
-    const a = Math.sin(dLat/2) * Math.sin(dLat/2) +
+
+    const a = Math.sin(dLat / 2) * Math.sin(dLat / 2) + 
               Math.cos(location.coords.latitude * Math.PI / 180) * 
-              Math.cos(shopLat * Math.PI / 180) *
-              Math.sin(dLon/2) * Math.sin(dLon/2);
-    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
-    return `${Math.round(c * 100)/100} km`;
-  };
+              Math.cos(shopLat * Math.PI / 180) * 
+              Math.sin(dLon / 2) * Math.sin(dLon / 2);
+
+    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+    const roadDistanceFactor = 1.2;
+    const distance = R * c * roadDistanceFactor;
+
+    return `${Math.round(distance * 10) / 10} km`;
+};
+
 
   const handleShopPress = (shop: Shop) => {
     if (!shop?.id) {
