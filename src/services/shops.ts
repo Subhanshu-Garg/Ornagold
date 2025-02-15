@@ -70,10 +70,9 @@ export const createShop = async (shopData: Partial<Shop>): Promise<Shop> => {
 };
 
 export const updateShop = async (shopId: string, updates: Partial<Shop>): Promise<Shop> => {
-  const { location, ...safeUpdates } = updates;
   const { data, error } = await supabase
     .from('shops')
-    .update(safeUpdates)
+    .update(updates)
     .eq('id', shopId)
     .select(shopView)
     .single();
