@@ -33,7 +33,7 @@ export default function CreateShopScreen({ route }: CreateShopScreenProps) {
   const { title } = route.params;
 
   const { theme } = useTheme();
-  const { user, createMyShop, updateMyShop } = useAppContext();
+  const { user, createMyShop, updateMyShop, getBestForNavigationLocation, reverseGeocode } = useAppContext();
   const styles = makeStyles(theme.colors);
   const navigation = useNavigation();
 
@@ -79,31 +79,10 @@ export default function CreateShopScreen({ route }: CreateShopScreenProps) {
   const handleLocation = async () => {
     try {
       setIsLoading(true);
-      let { status } = await Location.requestForegroundPermissionsAsync();
-      if (status !== "granted") {
-        Alert.alert("Permission to access location was denied");
-        return;
-      }
+      const location = await getBestForNavigationLocation()
+      const [geo] = await reverseGeocode(location);
 
-      // Check if precise location is enabled
-    const providerStatus = await Location.getProviderStatusAsync();
-    if (!providerStatus.locationServicesEnabled || !providerStatus.gpsAvailable) {
-      Alert.alert(
-        "Precise Location Required",
-        "Please enable precise location in your device settings to continue."
-      );
-      return;
-    }
-
-      const location = await Location.getCurrentPositionAsync({
-        accuracy: Location.Accuracy.BestForNavigation,
-      });
-      const [reverseGeocode] = await Location.reverseGeocodeAsync({
-        latitude: location.coords.latitude,
-        longitude: location.coords.longitude,
-      });
-
-      const city = reverseGeocode.city || reverseGeocode.region || "";
+      const city = geo.city || geo.region || "";
       const currentLocality = shop.locality || "";
       const newLocality = currentLocality.includes(city)
         ? currentLocality

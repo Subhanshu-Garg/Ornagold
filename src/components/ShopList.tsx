@@ -79,7 +79,7 @@ export default function ShopList({
           <View style={styles.distanceContainer}>
             <Icon name="location-on" size={14} color={theme.colors.primary} />
             <Text style={styles.distanceText}>
-              {calculateDistance(item.latitude, item.longitude)}
+              ~{calculateDistance(item.latitude, item.longitude)}
             </Text>
           </View>
         )}

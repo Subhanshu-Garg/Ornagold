@@ -23,7 +23,7 @@ export default function ShopListScreen({ route, navigation }: ShopListScreenProp
   const { theme } = useTheme();
   const styles = makeStyles(theme.colors);
   const { title, searchQuery, filters, sort, isMyShops } = route.params;
-  const { myShops } = useAppContext();
+  const { myShops, location } = useAppContext();
 //   const [searchQuery, setSearchQuery] = useState('');
   const [shops, setShops] = useState<Shop[]>([]);
   const [page, setPage] = useState(1);
@@ -86,7 +86,7 @@ export default function ShopListScreen({ route, navigation }: ShopListScreenProp
         hasMore={hasMore}
         horizontal={false}
         showDistance={true}
-        location={null} // Pass actual location if available // Pass actual location if available
+        location={location}
       />
 
       {/* <MetricCards /> */}

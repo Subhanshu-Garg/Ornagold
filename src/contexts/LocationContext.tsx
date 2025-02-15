@@ -6,8 +6,8 @@ import AppError, { errorHandler } from '../utils/errorHandler';
 type LocationContextType = {
   location: Location.LocationObject | null;
   locationLoading: boolean;
-  getCurrentLocation: () => Promise<Location.LocationObject | null>;
-  getBestForNavigationLocation: () => Promise<Location.LocationObject | null>;
+  getCurrentLocation: () => Promise<Location.LocationObject>;
+  getBestForNavigationLocation: () => Promise<Location.LocationObject>;
   reverseGeocode: (location: Location.LocationObject) => Promise<Location.LocationGeocodedAddress[]>;
 };
 
@@ -24,6 +24,7 @@ export const LocationProvider = ({ children }: { children: React.ReactNode }) =>
   }, []);
 
   const getCurrentLocation = async () => {
+    let location: Location.LocationObject
     try {
       setLoading(true);
       const { status } = await Location.requestForegroundPermissionsAsync();
@@ -31,17 +32,21 @@ export const LocationProvider = ({ children }: { children: React.ReactNode }) =>
         throw new AppError('VALIDATION', 'Location access required!');
       }
 
-      const location = await Location.getLastKnownPositionAsync({
+      location = await Location.getLastKnownPositionAsync({
         maxAge: 3 * 24 * 60 * 60 * 1000 // 3 days
       }) || await Location.getCurrentPositionAsync()
       setLocation(location);
+      return location
+    } catch (error) {
+      throw new AppError('VALIDATION', 'Error while fetching location')
     } finally {
       setLoading(false);
-      return location;
+      return location!;
     }
   };
 
   const getBestForNavigationLocation = async () => {
+    let location: Location.LocationObject
     try {
       setLoading(true);
       const { status } = await Location.requestForegroundPermissionsAsync();
@@ -49,7 +54,7 @@ export const LocationProvider = ({ children }: { children: React.ReactNode }) =>
         throw new AppError('VALIDATION', 'Location access denied!');
       }
 
-      const location = await Location.getCurrentPositionAsync({
+      location = await Location.getCurrentPositionAsync({
         accuracy: Location.Accuracy.BestForNavigation
       });
 
@@ -64,7 +69,7 @@ export const LocationProvider = ({ children }: { children: React.ReactNode }) =>
       throw new AppError('UNKNOWN', 'Something went wrong while fetching location!', error)
     } finally {
       setLoading(false);
-      return location;
+      return location!;
     }
   };
 
