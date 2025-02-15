@@ -1,0 +1,1 @@
+ALTER table "goldratecache" RENAME to "goldRateCache"

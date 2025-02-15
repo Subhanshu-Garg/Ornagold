@@ -1,8 +1,9 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { View, Text, FlatList, StyleSheet } from "react-native";
 import { useTheme } from "../contexts/ThemeContext";
 import { Theme } from "../constants/Theme";
 import SectionHeader from "./SectionHeader";
+import { fetchGoldRate } from "../services/goldRate";
 
 type Metric = {
   title: string;
@@ -14,11 +15,23 @@ type Metric = {
 const MetricCards = () => {
   const { theme } = useTheme();
   const styles = makeStyles(theme.colors);
+  const [goldRate, setGoldRate] = useState('');
+
+  useEffect(() => {
+    const getGoldRate = async () => {
+      const rate = await fetchGoldRate().catch((error) => {
+        console.error('Error while fetching gold rate', error)
+      })
+      setGoldRate(rate || 'N/A')
+    }
+
+    getGoldRate()
+  }, [])
 
   const metrics: Metric[] = [
     {
       title: "24K Gold Rate",
-      value: "₹5,800/g",
+      value: goldRate,
       change: "↓ 1.2%",
       isPositive: false,
     },

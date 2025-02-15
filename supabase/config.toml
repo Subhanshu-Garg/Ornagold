@@ -42,6 +42,9 @@ default_pool_size = 20
 # Maximum number of client connections allowed.
 max_client_conn = 100
 
+# [db.vault]
+# secret_key = "env(SECRET_VALUE)"
+
 [db.seed]
 # If enabled, seeds the database after migrations during a db reset.
 enabled = true
@@ -119,6 +122,12 @@ minimum_password_length = 6
 # are: `letters_digits`, `lower_upper_letters_digits`, `lower_upper_letters_digits_symbols`
 password_requirements = ""
 
+# Configure one of the supported captcha providers: `hcaptcha`, `turnstile`.
+# [auth.captcha]
+# enabled = true
+# provider = "hcaptcha"
+# secret = ""
+
 [auth.email]
 # Allow/disallow new user signups via email to your project.
 enable_signup = true
@@ -162,8 +171,9 @@ template = "Your code is {{ .Code }}"
 max_frequency = "5s"
 
 # Use pre-defined map of phone number to OTP for testing.
-# [auth.sms.test_otp]
-# 4152127777 = "123456"
+[auth.sms.test_otp]
+"+917011564838" = "040700"
+"+918800602965" = "010120"
 
 # Configure logged in session timeouts.
 # [auth.sessions]

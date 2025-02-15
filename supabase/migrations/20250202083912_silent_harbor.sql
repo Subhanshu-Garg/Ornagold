@@ -79,51 +79,68 @@ CREATE TABLE IF NOT EXISTS shop_owners (
 ALTER TABLE shops ENABLE ROW LEVEL SECURITY;
 ALTER TABLE reviews ENABLE ROW LEVEL SECURITY;
 
--- Create policies for shops
-CREATE POLICY "Allow public read access to shops"
-    ON shops
-    FOR SELECT
-    TO public
-    USING (true);
+-- Conditional Creation of Policies for shops
+DO $$
+BEGIN
+    -- Check if the policy exists before creating it
+    IF NOT EXISTS (SELECT 1 FROM pg_policies WHERE policyname = 'Allow public read access to shops') THEN
+        CREATE POLICY "Allow public read access to shops"
+            ON shops
+            FOR SELECT
+            TO public
+            USING (true);
+    END IF;
 
-CREATE POLICY "Allow authenticated users to create shops"
-    ON shops
-    FOR INSERT
-    TO authenticated
-    WITH CHECK (true);
+    IF NOT EXISTS (SELECT 1 FROM pg_policies WHERE policyname = 'Allow authenticated users to create shops') THEN
+        CREATE POLICY "Allow authenticated users to create shops"
+            ON shops
+            FOR INSERT
+            TO authenticated
+            WITH CHECK (true);
+    END IF;
 
-CREATE POLICY "Allow shop owners to update their shops"
-    ON shops
-    FOR UPDATE
-    TO authenticated
-    USING (auth.uid() IN (
-        SELECT "userId"
-        FROM shop_owners
-        WHERE "shopId" = id
-    ));
+    IF NOT EXISTS (SELECT 1 FROM pg_policies WHERE policyname = 'Allow shop owners to update their shops') THEN
+        CREATE POLICY "Allow shop owners to update their shops"
+            ON shops
+            FOR UPDATE
+            TO authenticated
+            USING (auth.uid() IN (
+                SELECT "userId"
+                FROM shop_owners
+                WHERE "shopId" = id
+            ));
+    END IF;
 
-CREATE POLICY "Allow shop owners to delete their shops"
-    ON shops
-    FOR DELETE
-    TO authenticated
-    USING (auth.uid() IN (
-        SELECT "userId"
-        FROM shop_owners
-        WHERE "shopId" = id
-    ));
+    IF NOT EXISTS (SELECT 1 FROM pg_policies WHERE policyname = 'Allow shop owners to delete their shops') THEN
+        CREATE POLICY "Allow shop owners to delete their shops"
+            ON shops
+            FOR DELETE
+            TO authenticated
+            USING (auth.uid() IN (
+                SELECT "userId"
+                FROM shop_owners
+                WHERE "shopId" = id
+            ));
+    END IF;
 
--- Create policies for reviews
-CREATE POLICY "Allow public read access to reviews"
-    ON reviews
-    FOR SELECT
-    TO public
-    USING (true);
+    -- Check if the policy exists before creating it for reviews
+    IF NOT EXISTS (SELECT 1 FROM pg_policies WHERE policyname = 'Allow public read access to reviews') THEN
+        CREATE POLICY "Allow public read access to reviews"
+            ON reviews
+            FOR SELECT
+            TO public
+            USING (true);
+    END IF;
 
-CREATE POLICY "Allow authenticated users to create reviews"
-    ON reviews
-    FOR INSERT
-    TO authenticated
-    WITH CHECK (auth.uid() = "userId");
+    IF NOT EXISTS (SELECT 1 FROM pg_policies WHERE policyname = 'Allow authenticated users to create reviews') THEN
+        CREATE POLICY "Allow authenticated users to create reviews"
+            ON reviews
+            FOR INSERT
+            TO authenticated
+            WITH CHECK (auth.uid() = "userId");
+    END IF;
+END $$;
+
 
 -- Create function to find nearby shops
 CREATE OR REPLACE FUNCTION "getNearbyShops"(
