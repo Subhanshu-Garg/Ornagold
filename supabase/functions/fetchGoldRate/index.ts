@@ -12,7 +12,7 @@ const supabase = createClient(
 )
 
 async function fetchGoldRateInINR() {
-  const cutoffDate = new Date(Date.now() - (24 * 60 * 60 * 1000));
+  const cutoffDate = new Date(Date.now() - (12 * 60 * 60 * 1000));
   const { data: cachedData, error: errInGetCache } = await supabase
     .from('goldRateCache')
     .select('*')
