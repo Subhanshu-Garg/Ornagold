@@ -10,9 +10,7 @@ export const getShops = async (
   filters?: Filter[],
   sorts?: Sort[]
 ): Promise<{ shops: Shop[]; hasMore: boolean }> => {
-  const PAGE_SIZE = 6;
-  console.log('filters', filters)
-  console.log('sorts', sorts)
+  const PAGE_SIZE = 10;
   let query = supabase
     .from('shops')
     .select(shopView)
