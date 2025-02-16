@@ -26,95 +26,14 @@ import FilterTag from "../components/FilterTag";
 import Slider from "@react-native-community/slider";
 import Modal from "react-native-modal";
 import moment from "moment";
+import { useSduiConfig } from '../hooks/useSduiConfig';
+import { SduiFilterConfig, SduiComponentConfig, SduiLayoutConfig } from '../types/sduiConfig';
+import { parseSduiConfiguration } from '../utils/parseSduiConfiguration';
 
 type ShopListScreenProps = {
   navigation: NativeStackNavigationProp<RootStackParamList, "ShopList">;
   route: RouteProp<RootStackParamList, "ShopList">;
 };
-
-const FILTER_TYPES: {
-  id: string;
-  label: string;
-  options: {
-    label: string,
-    value: any
-  }[]
-  filters: Filter[];
-  sorts: Sort[];
-}[] = [
-  {
-    id: "goldRate",
-    label: "Gold Rate",
-    options: [
-      { label: "5000 or less", value: 5000 },
-      { label: "5500 or less", value: 5500 },
-      { label: "6000 or less", value: 6000 },
-      { label: "8000 or less", value: 8000 },
-      { label: "10000 or less", value: 10_000 },
-    ],
-    filters: [
-      {
-        field: "goldRate",
-        operator: "lte",
-        value: 10_000,
-      },
-    ],
-    sorts: [
-      {
-        field: "goldRate",
-        order: "asc",
-      },
-    ],
-  },
-  {
-    id: "makingCharges",
-    label: "Making Charges",
-    options: [
-      { label: "10% or less", value: 10 },
-      { label: "20% or less", value: 20 },
-      { label: "30% or less", value: 30 },
-      { label: "40% or less", value: 40 },
-      { label: "50% or less", value: 50 },
-    ],
-    filters: [
-      {
-        field: "makingCharges",
-        operator: "lte",
-        value: 60,
-      },
-    ],
-    sorts: [
-      {
-        field: "makingCharges",
-        order: "asc",
-      },
-    ],
-  },
-  {
-    id: "createdAt",
-    label: "New Shops",
-    options: [
-      { label: "Last 7 Days", value: moment().subtract(7, 'days').toISOString() },
-      { label: "Last 14 Days", value: moment().subtract(14, 'days').toISOString() },
-      { label: "Last 30 Days", value: moment().subtract(30, 'days').toISOString() },
-      { label: "Last 60 Days", value: moment().subtract(60, 'days').toISOString() },
-      { label: "Last 90 Days", value: moment().subtract(90, 'days').toISOString() },
-    ],
-    filters: [
-      {
-        field: "createdAt",
-        operator: "gte",
-        value: moment().subtract(30, 'days').toISOString(),
-      },
-    ],
-    sorts: [
-      {
-        field: "createdAt",
-        order: "des",
-      },
-    ],
-  },
-];
 
 export default function ShopListScreen({
   route,
@@ -125,8 +44,7 @@ export default function ShopListScreen({
   const {
     title,
     searchQuery,
-    filters: initialFilters,
-    sort: initialSorts,
+    filterTypes: initialFilterTypes,
     isMyShops,
   } = route.params;
   const { myShops, location } = useAppContext();
@@ -136,10 +54,11 @@ export default function ShopListScreen({
   const [isShopsLoading, setIsShopLoading] = useState(false);
   const [openStagger, setOpenStagger] = useState<string | null>(null);
 
-  const [filterTypes, setFilterTypes] = useState<typeof FILTER_TYPES>([]);
+  const [filterTypes, setFilterTypes] = useState<SduiFilterConfig[]>(initialFilterTypes || []);
+  const { config: shopFiltersConfig, isLoading: isConfigLoading } = useSduiConfig<SduiFilterConfig>('shop_filters');
 
   const handleFilterChange = (
-    filterType: (typeof FILTER_TYPES)[number],
+    filterType: SduiFilterConfig,
     value: number
   ) => {
     const updatedFilter = {
@@ -158,7 +77,7 @@ export default function ShopListScreen({
     });
   };
 
-  const loadShops = async (currentPage: number, filters?: typeof FILTER_TYPES) => {
+  const loadShops = async (currentPage: number, filters?: SduiFilterConfig[]) => {
     const filtrs = filters || filterTypes
     const fils: Filter[] = [];
     filtrs.forEach((f) => {
@@ -208,7 +127,9 @@ export default function ShopListScreen({
   };
 
   const renderFilterModal = () => {
-    const filterType = FILTER_TYPES.find((f) => f.id === openStagger);
+    if(!shopFiltersConfig) return 
+  
+    const filterType = shopFiltersConfig.find((f) => f.id === openStagger);
     if (!filterType) return null;
 
     const handleClearFilter = async () => {
@@ -230,16 +151,6 @@ export default function ShopListScreen({
       filterTypes.find((f) => f.id === openStagger) || filterType;
 
     const options = filterType.options;
-    // const min = filterType.min;
-    // const max = filterType.max;
-    // const step = filterType.steps;
-
-
-    // for (let i = min; i <= max; i += step) {
-    //   options.push(i);
-    // }
-
-    // Split options into pairs for two-column layout
     const optionPairs = [];
     for (let i = 0; i < options.length; i += 2) {
       optionPairs.push(options.slice(i, i + 2));
@@ -298,20 +209,20 @@ export default function ShopListScreen({
     );
   };
 
-  if (isShopsLoading) {
+  if (isShopsLoading || isConfigLoading) {
     return <LoadingSpinner />;
   }
 
   return (
     <SafeAreaView style={styles.container}>
-      {!isMyShops && (
+      {!isMyShops && shopFiltersConfig && (
         <>
           <ScrollView
             horizontal
             showsHorizontalScrollIndicator={false}
             style={styles.filterContainer}
           >
-            {FILTER_TYPES.map((filter) => (
+            {shopFiltersConfig.map((filter) => (
               <FilterTag
                 key={filter.id}
                 label={filter.label}

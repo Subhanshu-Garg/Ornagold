@@ -1,4 +1,5 @@
 import { AuthError, Session, User } from "@supabase/supabase-js";
+import { SduiFilterConfig } from "./types/sduiConfig";
 
 export interface Shop {
   id: string;
@@ -73,8 +74,7 @@ export type RootStackParamList = {
   ShopList: {
     title: string;
     searchQuery?: string;
-    filters?: Filter[];
-    sort?: Sort[];
+    filterTypes?: SduiFilterConfig[]
     isMyShops?: Boolean;
   };
   FAQs: undefined;
