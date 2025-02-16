@@ -7,12 +7,12 @@ type ParserConfig = {
 
 // Default parsers for known fields
 const defaultParsers: ParserConfig = {
-  createdAt: (value: any) => {
+  value: (value: any) => {
     if (typeof value === 'object' && value.time && value.unit) {
       return moment().subtract(value.time, value.unit).toISOString();
     }
-    return moment(value).toISOString();
-  },
+    return value;
+  }
   // Add more default parsers here
 };
 

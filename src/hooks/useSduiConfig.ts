@@ -13,7 +13,8 @@ export const useSduiConfig = <T = any>(key: string) => {
       try {
         setIsLoading(true);
         const data = await getSduiConfiguration<T>(key);
-        const parsedData = parseSduiConfiguration(data)
+        if(!data) return null
+        const parsedData = parseSduiConfiguration<SduiConfigResponse<T>>(data)
         setConfig(parsedData);
       } catch (error) {
         setError(error as Error);

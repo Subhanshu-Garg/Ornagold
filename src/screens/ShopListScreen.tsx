@@ -27,7 +27,7 @@ import Slider from "@react-native-community/slider";
 import Modal from "react-native-modal";
 import moment from "moment";
 import { useSduiConfig } from '../hooks/useSduiConfig';
-import { SduiFilterConfig, SduiComponentConfig, SduiLayoutConfig } from '../types/sduiConfig';
+import { SduiFilterConfig, SduiComponentConfig, SduiLayoutConfig, SduiOption } from '../types/sduiConfig';
 import { parseSduiConfiguration } from '../utils/parseSduiConfiguration';
 
 type ShopListScreenProps = {
@@ -59,7 +59,7 @@ export default function ShopListScreen({
 
   const handleFilterChange = (
     filterType: SduiFilterConfig,
-    value: number
+    value: SduiOption['value']
   ) => {
     const updatedFilter = {
       ...filterType,
@@ -167,10 +167,10 @@ export default function ShopListScreen({
 
         <View style={styles.filterOptions}>
           {optionPairs.map((pair, index) => (
-            <View key={index} style={styles.optionRow}>
+            <View key={`${filterType.id}-row-${index}`} style={styles.optionRow}>
               {pair.map(({ label, value }) => (
                 <TouchableOpacity
-                  key={value}
+                  key={`${filterType.id}-${label}`}
                   style={styles.radioButtonContainer}
                   onPress={() => handleFilterChange(filterType, value)}
                 >
