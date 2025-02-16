@@ -16,7 +16,7 @@ export interface SduiOption<T = any> {
 export interface SduiFilterConfig extends SduiBaseConfig {
   options: SduiOption[];
   filters: Filter[];
-  sorts: Sort[];
+  sorts?: Sort[];
 }
 
 export interface SduiComponentConfig extends SduiBaseConfig {

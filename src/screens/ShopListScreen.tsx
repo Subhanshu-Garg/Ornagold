@@ -86,7 +86,7 @@ export default function ShopListScreen({
 
     const srts: Sort[] = [];
     filtrs.forEach((f) => {
-      srts.push(...f.sorts);
+      srts.push(...f.sorts || []);
     });
     try {
       const { shops: newShops, hasMore } = isMyShops
