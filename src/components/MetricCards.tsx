@@ -17,22 +17,22 @@ const MetricCards = () => {
   const { theme } = useTheme();
   const styles = makeStyles(theme.colors);
   const [metric, setMetric] = useState({
-    rate: 'N/A',
+    rate: "N/A",
     change: 0,
-    changePercent: 'N/A',
-    lastUpdated: 'N/A'
+    changePercent: "N/A",
+    lastUpdated: "N/A",
   });
 
   useEffect(() => {
     const getGoldRate = async () => {
       const data = await fetchGoldRate().catch((error) => {
-        console.error('Error while fetching gold rate', error)
-      })
-      if (data) setMetric(data)
-    }
+        console.error("Error while fetching gold rate", error);
+      });
+      if (data) setMetric(data);
+    };
 
-    getGoldRate()
-  }, [])
+    getGoldRate();
+  }, []);
 
   const metrics: Metric[] = [
     {
@@ -40,45 +40,57 @@ const MetricCards = () => {
       value: metric.rate,
       change: metric.changePercent,
       isPositive: metric.change >= 0,
-      lastUpdated: metric.lastUpdated
+      lastUpdated: metric.lastUpdated,
     },
     {
       title: "Making Charges",
       value: "12% Avg",
       change: "→ 0%",
       isPositive: true,
-      lastUpdated: 'Yesterday'
+      lastUpdated: "Yesterday",
     },
   ];
 
   return (
     <>
-      <SectionHeader 
-        title="Today's Metrics"
-      />
+      <SectionHeader title="Today's Metrics" />
       <FlatList
         horizontal
         data={metrics}
         renderItem={({ item }) => (
           <View style={styles.card}>
             <Text style={styles.subtitle}>{item.title}</Text>
-            <Text style={styles.value}>{item.value}</Text>
-            <Text
-              style={[
-                styles.change,
-                {
-                  color: item.isPositive
-                    ? theme.colors.success
-                    : theme.colors.error,
-                },
-              ]}
-            >
-              {item.change}
-            </Text>
+            <View style={styles.measures}>
+              <Text
+                style={[
+                  styles.value,
+                  // {
+                  //   color: item.isPositive
+                  //     ? theme.colors.success
+                  //     : theme.colors.error,
+                  // },
+                ]}
+              >
+                {item.value}
+              </Text>
+              <Text
+                style={[
+                  styles.change,
+                  {
+                    color: item.isPositive
+                      ? theme.colors.success
+                      : theme.colors.error,
+                    marginLeft: 8,
+                  },
+                ]}
+              >
+                {item.change}
+              </Text>
+            </View>
             {item.lastUpdated && (
               <View style={styles.updatedContainer}>
-                <Text style={styles.updatedLabel}>Last updated:</Text>
-                <Text style={styles.updatedValue}>{item.lastUpdated}</Text>
+                {/* <Text style={styles.updatedLabel}>Last updated:</Text> */}
+                <Text style={styles.updatedValue}>As of {item.lastUpdated}</Text>
               </View>
             )}
           </View>
@@ -109,13 +121,13 @@ const makeStyles = (colors: Theme["colors"]) =>
       fontWeight: "bold",
     },
     value: {
-      color: colors.textPrimary,
       fontSize: 18,
       fontWeight: "bold",
-      marginVertical: 5,
     },
     change: {
       fontSize: 14,
+      alignSelf: 'flex-end',
+      marginBottom: 3, // Aligns better with the value text
     },
     updatedContainer: {
       marginTop: 8,
@@ -129,6 +141,11 @@ const makeStyles = (colors: Theme["colors"]) =>
       fontSize: 12,
       marginTop: 2, // Small space between label and value
     },
+    measures: {
+      flexDirection: 'row',
+      alignItems: 'baseline',
+      marginVertical: 5,
+    }
   });
 
 export default MetricCards;
