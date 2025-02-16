@@ -39,10 +39,10 @@ export default function DiscoverScreen({
     navigation.navigate("ShopList", {
       title: "Search Results...",
       searchQuery: searchVal,
-      sort: {
+      sort: [{
         field: "updatedAt",
         order: "des",
-      },
+      }],
     });
     setSearchVal('')
   }

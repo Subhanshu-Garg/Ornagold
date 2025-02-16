@@ -62,14 +62,7 @@ const MetricCards = () => {
             <Text style={styles.subtitle}>{item.title}</Text>
             <View style={styles.measures}>
               <Text
-                style={[
-                  styles.value,
-                  // {
-                  //   color: item.isPositive
-                  //     ? theme.colors.success
-                  //     : theme.colors.error,
-                  // },
-                ]}
+                style={styles.value}
               >
                 {item.value}
               </Text>
@@ -123,6 +116,7 @@ const makeStyles = (colors: Theme["colors"]) =>
     value: {
       fontSize: 18,
       fontWeight: "bold",
+      color: colors.textPrimary
     },
     change: {
       fontSize: 14,

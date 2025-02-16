@@ -209,12 +209,13 @@ export default function CreateShopScreen({ route }: CreateShopScreenProps) {
             value={shop.name}
             onChangeText={(text) => setShop({ ...shop, name: text })}
             placeholder="e.g. Golden Jewelers"
+            placeholderTextColor={theme.colors.lightGray}
           />
           {errors.name && <Text style={styles.errorText}>{errors.name}</Text>}
         </View>
 
         <View style={styles.inputGroup}>
-          <Text style={styles.label}>Phone Number *</Text>
+          <Text style={styles.label}>Phone Number (Non editable)</Text>
           <TextInput
             style={[styles.input, errors.phone && styles.errorInput]}
             value={shop.phone}
@@ -222,6 +223,7 @@ export default function CreateShopScreen({ route }: CreateShopScreenProps) {
             keyboardType="phone-pad"
             editable={false}
             placeholder="e.g. 9876543210"
+            placeholderTextColor={theme.colors.lightGray}
           />
           {errors.phone && <Text style={styles.errorText}>{errors.phone}</Text>}
         </View>
@@ -238,6 +240,7 @@ export default function CreateShopScreen({ route }: CreateShopScreenProps) {
               value={shop.goldRate}
               onChangeText={(text) => setShop({ ...shop, goldRate: text })}
               placeholder="e.g. 5500"
+              placeholderTextColor={theme.colors.lightGray}
               keyboardType="numeric"
             />
             {errors.goldRate && (
@@ -251,6 +254,7 @@ export default function CreateShopScreen({ route }: CreateShopScreenProps) {
               style={[styles.input, errors.makingCharges && styles.errorInput]}
               value={shop.makingCharges}
               placeholder="e.g. 12.5"
+              placeholderTextColor={theme.colors.lightGray}
               onChangeText={(text) => setShop({ ...shop, makingCharges: text })}
               keyboardType="numeric"
             />
@@ -271,6 +275,7 @@ export default function CreateShopScreen({ route }: CreateShopScreenProps) {
             value={shop.locality}
             onChangeText={(text) => setShop({ ...shop, locality: text })}
             placeholder="e.g. MG Road, Bangalore"
+            placeholderTextColor={theme.colors.lightGray}
           />
           {errors.locality && (
             <Text style={styles.errorText}>{errors.locality}</Text>
@@ -311,6 +316,7 @@ export default function CreateShopScreen({ route }: CreateShopScreenProps) {
             value={shop.address}
             onChangeText={(text) => setShop({ ...shop, address: text })}
             placeholder="e.g. 123 Jewel Street, Near City Mall"
+            placeholderTextColor={theme.colors.lightGray}
             multiline
             numberOfLines={3}
           />

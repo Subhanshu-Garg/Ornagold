@@ -14,6 +14,7 @@ export type Theme = {
     pureBlack: string;
     pureWhite: string;
     darkGray: string;
+    lightGray: string;
   };
   mode: 'light' | 'dark';
 };
@@ -21,7 +22,7 @@ export type Theme = {
 // Use Pick to extract only the common color properties
 type CommonColors = Pick<
   Theme['colors'],
-  'primary' | 'secondary' | 'success' | 'error' | 'pureBlack' | 'pureWhite' | 'primaryDark' | 'darkGray'
+  'primary' | 'secondary' | 'success' | 'error' | 'pureBlack' | 'pureWhite' | 'primaryDark' | 'darkGray' | 'lightGray'
 >;
 
 const commonColors: CommonColors = {
@@ -33,6 +34,7 @@ const commonColors: CommonColors = {
   darkGray: Colors.darkGray,
   pureWhite: Colors.pureWhite,
   primaryDark: '#c5a20a', // Darker gold shade
+  lightGray: Colors.lightGray,
 };
 
 // Helper function to create themes with type safety

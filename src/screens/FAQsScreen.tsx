@@ -26,6 +26,7 @@ export default function FAQsScreen() {
 
 const makeStyles = (colors: Theme['colors']) => StyleSheet.create({
   container: {
+    flex: 1,
     padding: 20,
     backgroundColor: colors.background,
   },

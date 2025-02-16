@@ -9,7 +9,7 @@ export const Colors = {
   pureWhite: '#ffffff',
   pureBlack: '#000000',
   darkGray: '#2d2d2d',
-  lightGray: '#f5f5f5',
+  lightGray: '#A9A9A9',
   mediumGray: '#666666',
   successGreen: '#4CAF50',
   errorRed: '#ff2c2c'

@@ -10,9 +10,10 @@ export default function useStatusBarColor(headerColor?: string) {
     const color = headerColor || theme.colors.background;
     const isDark = theme.mode === 'dark';
     
+    const headerStyle = headerColor === theme.colors.primary || !isDark ? 'dark-content' : 'light-content'
     // Batch status bar updates
     StatusBar.setBarStyle(
-      isDark ? 'light-content' : 'dark-content',
+      headerStyle,
       true // Enable animation
     );
     

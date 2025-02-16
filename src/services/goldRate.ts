@@ -8,9 +8,9 @@ export const fetchGoldRate = async () => {
   }
   const symbol = data.change >= 0 ? '↑' : '↓'
   return {
-    rate: `₹ ${Number(data.goldRatePerGramINR).toFixed(0).toString()}/gm`,
+    rate: `₹ ${Number(data.goldRatePerGramINR).toFixed(0)}/gm`,
     change: data.change,
-    changePercent: `${symbol} ${data.changePercent}%`,
+    changePercent: `${symbol} ${Math.abs(Number(data.changePercent)).toFixed(2)}%`,
     lastUpdated: moment(data.timestamp).calendar()
   };
 };

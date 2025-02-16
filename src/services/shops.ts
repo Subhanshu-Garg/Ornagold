@@ -1,5 +1,5 @@
 import { supabase, supabaseStorageUrl } from '../lib/supabase';
-import { RootStackParamList, Shop, shopView } from '../types';
+import { Filter, Shop, shopView, Sort } from '../types';
 import { errorHandler } from '../utils/errorHandler';
 import * as FileSystem from 'expo-file-system';
 import { Buffer } from 'buffer';
@@ -7,10 +7,12 @@ import { Buffer } from 'buffer';
 export const getShops = async (
   searchQuery?: string,
   page = 1,
-  filters?: RootStackParamList['ShopList']['filters'],
-  sort?: RootStackParamList['ShopList']['sort']
+  filters?: Filter[],
+  sorts?: Sort[]
 ): Promise<{ shops: Shop[]; hasMore: boolean }> => {
-  const PAGE_SIZE = 10;
+  const PAGE_SIZE = 6;
+  console.log('filters', filters)
+  console.log('sorts', sorts)
   let query = supabase
     .from('shops')
     .select(shopView)
@@ -28,13 +30,11 @@ export const getShops = async (
     query = query.filter(field, operator, value);
   });
 
-  // Sorting
-  if (sort) {
-    query = query.order(sort.field, { ascending: sort.order === 'asc' });
-  }
+  sorts?.forEach(({ field, order }) => {
+    query = query.order(field, { ascending: order === 'asc' });
+  })
 
   const { data, error } = await query;
-
   if (error) throw errorHandler.handle(error);
 
   return {

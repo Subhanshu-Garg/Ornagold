@@ -5,13 +5,7 @@ export const handleContactPress = async (phoneNum: string | void) => {
       const rawNumber = phoneNum || '+917011564838'; // Default without country code
       const sanitized = sanitizePhoneNum(rawNumber) || rawNumber;
       const phoneNumber = `tel:${sanitized}`;
-      const supported = await Linking.canOpenURL(phoneNumber)
-      
-      if (supported) {
-        await Linking.openURL(phoneNumber);
-      } else {
-        console.info('Phone calls not supported on this device');
-      }
+      await Linking.openURL(phoneNumber);
     } catch (error) {
       console.error('Error opening dialer:', error);
     }

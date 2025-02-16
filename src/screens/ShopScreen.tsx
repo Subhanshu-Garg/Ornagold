@@ -388,7 +388,7 @@ const makeStyles = (colors: Theme["colors"]) =>
     },
     fab: {
       position: "absolute",
-      bottom: 24,
+      bottom: 50,
       right: 24,
       width: 56,
       height: 56,

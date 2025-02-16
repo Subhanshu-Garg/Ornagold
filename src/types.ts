@@ -54,6 +54,17 @@ export interface AuthContextType {
   authError: AuthError | null;
 }
 
+export type Filter = {
+  field: string,
+  operator: string,
+  value: any
+}
+
+export type Sort = {
+  field: string,
+  order: 'asc' | 'des'
+}
+
 export type RootStackParamList = {
   MainTabs: undefined;
   Shop: { shop: Shop, isMyShop?: Boolean };
@@ -62,15 +73,8 @@ export type RootStackParamList = {
   ShopList: {
     title: string;
     searchQuery?: string;
-    filters?: {
-      field: string;
-      operator: string;
-      value: any;
-    }[];
-    sort?: {
-      field: string;
-      order: 'asc' | 'des'
-    };
+    filters?: Filter[];
+    sort?: Sort[];
     isMyShops?: Boolean;
   };
   FAQs: undefined;
