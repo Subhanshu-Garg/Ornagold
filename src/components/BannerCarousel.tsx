@@ -11,7 +11,7 @@ import {
 import { useTheme } from "../contexts/ThemeContext";
 import { LinearGradient } from "expo-linear-gradient";
 import { Theme } from "../constants/Theme";
-import Carousel from "pinar";
+import Carousel, { Props } from "pinar";
 import { Icon } from "@rneui/themed";
 import { Banner } from "../types";
 
@@ -27,19 +27,13 @@ configureReanimatedLogger({
   strict: false, // Reanimated runs in strict mode by default
 });
 
-type Props = {
-  banners: Banner[];
-  activeIndex: number;
-  onBannerChange: (index: number) => void;
-  headerColor: string;
+export interface BannerCarouselProps {
+  banners: Banner[]
 };
 
 const BannerCarousel = ({
-  banners,
-  activeIndex,
-  onBannerChange,
-  headerColor,
-}: Props) => {
+  banners
+}: BannerCarouselProps) => {
   const { theme } = useTheme();
   const styles = makeStyles(theme.colors);
 

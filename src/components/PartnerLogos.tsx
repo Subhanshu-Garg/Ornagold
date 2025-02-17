@@ -3,11 +3,11 @@ import { View, FlatList, Image, StyleSheet } from 'react-native';
 import { useTheme } from '../contexts/ThemeContext';
 import { Theme } from '../constants/Theme';
 
-type Props = {
+export interface PartnerLogosProps {
   logos: Array<string | number>;
 };
 
-const PartnerLogos = ({ logos }: Props) => {
+const PartnerLogos = ({ logos }: PartnerLogosProps) => {
   const { theme } = useTheme();
   const styles = makeStyles(theme.colors);
 

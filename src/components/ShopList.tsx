@@ -6,7 +6,7 @@ import { Theme } from '../constants/Theme';
 import { Icon } from 'react-native-elements';
 import * as Location from 'expo-location';
 
-interface ShopListProps {
+export interface ShopListProps {
   shops: Shop[];
   onShopPress: (shop: Shop) => void;
   onEndReached?: () => void;

@@ -6,6 +6,8 @@ import { Theme } from '../constants/Theme';
 import { Icon } from 'react-native-elements';
 import { handleContactPress } from '../helpers';
 
+export interface ReachOutSectionProps {}
+
 const ReachOutSection = () => {
   const { theme } = useTheme();
   const styles = makeStyles(theme.colors);

@@ -13,6 +13,8 @@ type Metric = {
   lastUpdated: string;
 };
 
+export interface MetricCardsProps {}
+
 const MetricCards = () => {
   const { theme } = useTheme();
   const styles = makeStyles(theme.colors);

@@ -50,7 +50,7 @@ async function fetchGoldRateInINR() {
   const lastUpdatedAt = new Date().toISOString()
   const timestamp = new Date(unixTimestamp * 1000).toISOString()
 
-  const previousRate = cachedData[0]?.goldRatePerGramINR;
+  const previousRate = cachedData ? cachedData[0]?.goldRatePerGramINR : 0;
   const change = previousRate ? goldRatePerGramINR - previousRate : 0;
   const changePercent = change / previousRate * 100;
 
@@ -66,7 +66,7 @@ async function fetchGoldRateInINR() {
   return { goldRatePerGramINR, timestamp, lastUpdatedAt, change, changePercent }
 }
 
-Deno.serve(async (req) => {
+Deno.serve(async (_req) => {
   try {
     const response = await fetchGoldRateInINR()
     return new Response(
@@ -75,7 +75,7 @@ Deno.serve(async (req) => {
     )
   } catch (error) {
     return new Response(
-      JSON.stringify({ error: error.message }),
+      JSON.stringify({ error: error instanceof Error ? error.message : 'Unknown error' }),
       { status: 500, headers: { "Content-Type": "application/json" } }
     )
   }
