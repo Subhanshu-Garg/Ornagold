@@ -156,9 +156,6 @@ export default function HomeScreen({ navigation }: HomeScreenProps) {
           <>
             <BannerCarousel
               banners={BANNER_IMAGES}
-              activeIndex={activeBanner}
-              onBannerChange={setActiveBanner}
-              headerColor={theme.colors.background}
             />
 
             <ShopListContainer
